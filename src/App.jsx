@@ -5,21 +5,20 @@ import Admin from './Admin'
 import Requisites from './Requisites'
 import './App.css'
 
+const YOOMONEY_WALLET = '4100119639377973'
+
 function App() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('Все')
 
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('YouTubeOS_Shop_cart')
-
       if (!saved) return []
 
       const parsed = JSON.parse(saved)
-
       if (!Array.isArray(parsed)) return []
 
       return parsed.map((item) => ({
@@ -33,7 +32,6 @@ function App() {
   })
 
   const [cartOpen, setCartOpen] = useState(false)
-
   const [user, setUser] = useState(null)
 
   const [myOrders, setMyOrders] = useState([])
@@ -42,7 +40,6 @@ function App() {
   const [expandedOrder, setExpandedOrder] = useState(null)
 
   const [authOpen, setAuthOpen] = useState(false)
-
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
 
@@ -250,6 +247,34 @@ function App() {
     )
   }
 
+  // Переход на официальную форму оплаты ЮMoney
+  function goToYooMoneyPayment(orderNumber, total) {
+    const form = document.createElement('form')
+
+    form.method = 'POST'
+    form.action = 'https://yoomoney.ru/quickpay/confirm'
+    form.style.display = 'none'
+
+    const fields = {
+      receiver: YOOMONEY_WALLET,
+      'quickpay-form': 'button',
+      paymentType: 'AC',
+      sum: Number(total).toFixed(2),
+      label: orderNumber,
+    }
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = name
+      input.value = value
+      form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+  }
+
   async function checkout() {
     if (cart.length === 0 || checkoutLoading) return
 
@@ -263,26 +288,17 @@ function App() {
           .eq('id', item.id)
           .single()
 
-        if (error) {
-          throw error
-        }
+        if (error) throw error
 
-        if (
-          Number(product.stock) <
-          Number(item.quantity)
-        ) {
-          alert(
-            `Недостаточно товара: ${product.name}`,
-          )
-
+        if (Number(product.stock) < Number(item.quantity)) {
+          alert(`Недостаточно товара: ${product.name}`)
           return
         }
       }
 
-      const orderNumber =
-        `PM-${Date.now()
-          .toString()
-          .slice(-6)}`
+      const orderNumber = `PM-${Date.now()
+        .toString()
+        .slice(-6)}`
 
       const total = cart.reduce(
         (sum, item) =>
@@ -304,19 +320,15 @@ function App() {
           payment_status: 'pending',
           delivery_method: 'СДЭК',
           customer_name:
-            user?.user_metadata?.name ||
-            'Покупатель',
+            user?.user_metadata?.name || 'Покупатель',
           customer_phone: 'Не указан',
-          customer_email:
-            user?.email || null,
+          customer_email: user?.email || null,
           total,
         })
         .select()
         .single()
 
-      if (orderError) {
-        throw orderError
-      }
+      if (orderError) throw orderError
 
       const items = cart.map((item) => ({
         order_id: order.id,
@@ -326,20 +338,14 @@ function App() {
         quantity: Number(item.quantity),
       }))
 
-      const {
-        error: itemsError,
-      } = await supabase
+      const { error: itemsError } = await supabase
         .from('order_items')
         .insert(items)
 
-      if (itemsError) {
-        throw itemsError
-      }
+      if (itemsError) throw itemsError
 
       for (const item of cart) {
-        const {
-          data: product,
-        } = await supabase
+        const { data: product } = await supabase
           .from('products')
           .select('stock')
           .eq('id', item.id)
@@ -357,18 +363,14 @@ function App() {
           .eq('id', item.id)
       }
 
-      setOrderSuccess({
-        orderNumber,
-        total,
-        payment: true,
-      })
-
       setCart([])
+
+      // Закрываем корзину и сразу отправляем покупателя на ЮMoney
+      setCartOpen(false)
+
+      goToYooMoneyPayment(orderNumber, total)
     } catch (error) {
-      console.error(
-        'Ошибка оформления:',
-        error,
-      )
+      console.error('Ошибка оформления:', error)
 
       alert(
         error.message ||
@@ -389,7 +391,6 @@ function App() {
     setMyOrders([])
   }
 
-  // Страница реквизитов
   if (window.location.pathname === '/requisites') {
     return <Requisites />
   }
@@ -398,7 +399,7 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-inner">
-          <a href="#" className="logo">
+          <a href="/" className="logo">
             <span className="logo-main">
               YOUTUBEOS
             </span>
@@ -415,9 +416,7 @@ function App() {
           </p>
 
           <div className="search">
-            <span className="search-icon">
-              ⌕
-            </span>
+            <span className="search-icon">⌕</span>
 
             <input
               type="text"
@@ -544,7 +543,6 @@ function App() {
           }}
         >
           <span>🦄</span>
-
           <h2>MLP</h2>
 
           <p>
@@ -567,7 +565,6 @@ function App() {
           }}
         >
           <span>🎵</span>
-
           <h2>Музыка</h2>
 
           <p>
@@ -578,10 +575,7 @@ function App() {
         </div>
       </section>
 
-      <section
-        className="catalog"
-        id="catalog"
-      >
+      <section className="catalog" id="catalog">
         <div className="catalog-top">
           <div>
             <p className="section-label">
@@ -621,20 +615,13 @@ function App() {
           <div className="empty">
             <div className="loader"></div>
 
-            <h3>
-              Загрузка товаров
-            </h3>
+            <h3>Загрузка товаров</h3>
 
-            <p>
-              Подожди немного...
-            </p>
+            <p>Подожди немного...</p>
           </div>
-        ) : filteredProducts.length ===
-          0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="empty">
-            <div className="empty-icon">
-              ♫
-            </div>
+            <div className="empty-icon">♫</div>
 
             <h3>
               {search
@@ -652,9 +639,7 @@ function App() {
               <button
                 type="button"
                 className="secondary-button"
-                onClick={() =>
-                  setSearch('')
-                }
+                onClick={() => setSearch('')}
               >
                 Сбросить поиск
               </button>
@@ -662,101 +647,85 @@ function App() {
           </div>
         ) : (
           <div className="products">
-            {filteredProducts.map(
-              (product) => (
-                <article
-                  className="product-card"
-                  key={product.id}
-                >
-                  <div className="product-image">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                      />
-                    ) : (
-                      <div className="no-image">
-                        ♫
-                      </div>
-                    )}
+            {filteredProducts.map((product) => (
+              <article
+                className="product-card"
+                key={product.id}
+              >
+                <div className="product-image">
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                    />
+                  ) : (
+                    <div className="no-image">
+                      ♫
+                    </div>
+                  )}
 
-                    {Number(product.stock) <=
-                      0 && (
-                      <div className="sold-out">
-                        Нет в наличии
-                      </div>
-                    )}
+                  {Number(product.stock) <= 0 && (
+                    <div className="sold-out">
+                      Нет в наличии
+                    </div>
+                  )}
+                </div>
+
+                <div className="product-info">
+                  <div className="category">
+                    {product.category || 'ТОВАР'}
                   </div>
 
-                  <div className="product-info">
-                    <div className="category">
-                      {product.category ||
-                        'ТОВАР'}
-                    </div>
+                  <h3>{product.name}</h3>
 
-                    <h3>
-                      {product.name}
-                    </h3>
+                  <p>
+                    {product.description || ''}
+                  </p>
 
-                    <p>
-                      {product.description ||
-                        ''}
-                    </p>
+                  {Number(product.stock) > 0 ? (
+                    <small className="stock-info">
+                      Осталось: {product.stock} шт.
+                    </small>
+                  ) : (
+                    <small className="stock-empty">
+                      Нет в наличии
+                    </small>
+                  )}
 
-                    {Number(product.stock) >
-                    0 ? (
-                      <small className="stock-info">
-                        Осталось:{' '}
-                        {product.stock} шт.
-                      </small>
-                    ) : (
-                      <small className="stock-empty">
-                        Нет в наличии
-                      </small>
-                    )}
+                  <div className="product-bottom">
+                    <strong>
+                      {Number(
+                        product.price || 0,
+                      ).toLocaleString('ru-RU')}{' '}
+                      ₽
+                    </strong>
 
-                    <div className="product-bottom">
-                      <strong>
-                        {Number(
-                          product.price || 0,
-                        ).toLocaleString(
-                          'ru-RU',
-                        )}{' '}
-                        ₽
-                      </strong>
-
-                      <button
-                        type="button"
-                        className="add-button"
-                        disabled={
-                          Number(
-                            product.stock,
-                          ) <= 0
-                        }
-                        onClick={() =>
-                          addToCart(product)
-                        }
-                      >
-                        В корзину
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className="add-button"
+                      disabled={
+                        Number(product.stock) <= 0
+                      }
+                      onClick={() =>
+                        addToCart(product)
+                      }
+                    >
+                      В корзину
+                    </button>
                   </div>
-                </article>
-              ),
-            )}
+                </div>
+              </article>
+            ))}
           </div>
         )}
       </section>
 
       <footer className="footer">
         <div>
-          <strong>
-            YouTubeOS Shop
-          </strong>
+          <strong>YouTubeOS Shop</strong>
 
           <p>
-            © {new Date().getFullYear()}{' '}
-            YouTubeOS Shop
+            © {new Date().getFullYear()} YouTubeOS Shop
           </p>
         </div>
       </footer>
@@ -796,19 +765,13 @@ function App() {
               <div className="cart-empty">
                 <div className="loader"></div>
 
-                <h3>
-                  Загрузка заказов...
-                </h3>
+                <h3>Загрузка заказов...</h3>
               </div>
             ) : myOrders.length === 0 ? (
               <div className="cart-empty">
-                <div className="empty-icon">
-                  📦
-                </div>
+                <div className="empty-icon">📦</div>
 
-                <h3>
-                  Заказов пока нет
-                </h3>
+                <h3>Заказов пока нет</h3>
 
                 <p>
                   Здесь появятся твои покупки.
@@ -824,25 +787,14 @@ function App() {
                     order.order_items?.reduce(
                       (sum, item) =>
                         sum +
-                        Number(
-                          item.quantity || 0,
-                        ),
+                        Number(item.quantity || 0),
                       0,
                     ) || 0
 
                   const statusText =
                     order.status === 'pending'
                       ? 'В обработке'
-                      : order.status ===
-                          'В обработке'
-                        ? 'В обработке'
-                        : order.status ===
-                            'Отправлен'
-                          ? 'Отправлен'
-                          : order.status ===
-                              'Завершён'
-                            ? 'Завершён'
-                            : order.status
+                      : order.status
 
                   return (
                     <div
@@ -875,16 +827,7 @@ function App() {
                             </h3>
                           </div>
 
-                          <span
-                            className={`order-status status-${String(
-                              order.status,
-                            )
-                              .toLowerCase()
-                              .replaceAll(
-                                ' ',
-                                '-',
-                              )}`}
-                          >
+                          <span className="order-status">
                             {statusText}
                           </span>
                         </div>
@@ -931,9 +874,7 @@ function App() {
                         </div>
 
                         <div className="order-card-bottom">
-                          <span>
-                            🚚 СДЭК
-                          </span>
+                          <span>🚚 СДЭК</span>
 
                           <span className="order-expand">
                             {isExpanded
@@ -977,13 +918,11 @@ function App() {
 
                                   <span>
                                     {Number(
-                                      item.quantity ||
-                                        0,
+                                      item.quantity || 0,
                                     )}{' '}
                                     шт. ×{' '}
                                     {Number(
-                                      item.price ||
-                                        0,
+                                      item.price || 0,
                                     ).toLocaleString(
                                       'ru-RU',
                                     )}{' '}
@@ -994,12 +933,10 @@ function App() {
                                 <strong>
                                   {(
                                     Number(
-                                      item.price ||
-                                        0,
+                                      item.price || 0,
                                     ) *
                                     Number(
-                                      item.quantity ||
-                                        0,
+                                      item.quantity || 0,
                                     )
                                   ).toLocaleString(
                                     'ru-RU',
@@ -1023,9 +960,7 @@ function App() {
                           )}
 
                           <div className="order-details-total">
-                            <span>
-                              Итого
-                            </span>
+                            <span>Итого</span>
 
                             <strong>
                               {Number(
@@ -1047,122 +982,6 @@ function App() {
         </div>
       )}
 
-      {orderSuccess && (
-        <div
-          className="success-overlay"
-          onClick={() =>
-            setOrderSuccess(null)
-          }
-        >
-          <div
-            className="success-card"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <button
-              type="button"
-              className="success-close"
-              onClick={() =>
-                setOrderSuccess(null)
-              }
-            >
-              ×
-            </button>
-
-            <div className="success-icon">
-              ✓
-            </div>
-
-            <h2>
-              Заказ оформлен!
-            </h2>
-
-            {orderSuccess.payment && (
-              <div className="payment-qr">
-                <h3>Оплата заказа</h3>
-
-                <p>
-                  Отсканируй QR-код в приложении банка
-                </p>
-
-                <strong>
-                  К оплате:{' '}
-                  {Number(
-                    orderSuccess.total || 0,
-                  ).toLocaleString(
-                    'ru-RU',
-                  )}{' '}
-                  ₽
-                </strong>
-
-                <img
-                  src="/payment-qr.png"
-                  alt="QR-код для оплаты"
-                  className="payment-qr-image"
-                />
-
-                <button
-                  type="button"
-                  className="payment-done-button"
-                  onClick={() => {
-                    setOrderSuccess(null)
-                    loadMyOrders()
-                  }}
-                >
-                  ✓ Я оплатил
-                </button>
-              </div>
-            )}
-
-            <p>
-              Спасибо за покупку 💜
-            </p>
-
-            <div className="success-order">
-              <span>
-                Номер заказа
-              </span>
-
-              <strong>
-                {orderSuccess.orderNumber}
-              </strong>
-            </div>
-
-            <div className="success-pickup">
-              <strong>
-                🚚 Доставка СДЭК
-              </strong>
-
-              <p>
-                Заказ будет отправлен через
-                СДЭК. Информация о доставке
-                будет сообщена отдельно.
-              </p>
-            </div>
-
-            <a
-              className="telegram-button"
-              href="https://t.me/YouTubeOS"
-              target="_blank"
-              rel="noreferrer"
-            >
-              ✈️ Написать в Telegram
-            </a>
-
-            <button
-              type="button"
-              className="success-home-button"
-              onClick={() =>
-                setOrderSuccess(null)
-              }
-            >
-              Вернуться в магазин
-            </button>
-          </div>
-        </div>
-      )}
-
       {authOpen && (
         <Auth
           onClose={() => {
@@ -1174,21 +993,15 @@ function App() {
 
       {adminOpen && (
         <Admin
-          onClose={() =>
-            setAdminOpen(false)
-          }
-          onProductsChanged={
-            loadProducts
-          }
+          onClose={() => setAdminOpen(false)}
+          onProductsChanged={loadProducts}
         />
       )}
 
       {cartOpen && (
         <div
           className="cart-overlay"
-          onClick={() =>
-            setCartOpen(false)
-          }
+          onClick={() => setCartOpen(false)}
         >
           <aside
             className="cart"
@@ -1202,9 +1015,7 @@ function App() {
               <button
                 type="button"
                 className="close-button"
-                onClick={() =>
-                  setCartOpen(false)
-                }
+                onClick={() => setCartOpen(false)}
               >
                 ×
               </button>
@@ -1212,13 +1023,10 @@ function App() {
 
             {cart.length === 0 ? (
               <div className="cart-empty">
-                <h3>
-                  Корзина пуста
-                </h3>
+                <h3>Корзина пуста</h3>
 
                 <p>
-                  Добавь что-нибудь из
-                  каталога.
+                  Добавь что-нибудь из каталога.
                 </p>
               </div>
             ) : (
@@ -1237,9 +1045,7 @@ function App() {
                     )}
 
                     <div className="cart-item-info">
-                      <h3>
-                        {item.name}
-                      </h3>
+                      <h3>{item.name}</h3>
 
                       <strong>
                         {Number(
@@ -1298,9 +1104,7 @@ function App() {
             {cart.length > 0 && (
               <div className="cart-footer">
                 <div className="total">
-                  <span>
-                    Итого
-                  </span>
+                  <span>Итого</span>
 
                   <strong>
                     {cartTotal.toLocaleString(
@@ -1314,9 +1118,7 @@ function App() {
                   type="button"
                   className="checkout-button"
                   onClick={checkout}
-                  disabled={
-                    checkoutLoading
-                  }
+                  disabled={checkoutLoading}
                 >
                   {checkoutLoading
                     ? 'Оформляем...'
