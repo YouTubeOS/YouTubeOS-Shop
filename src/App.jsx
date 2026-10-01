@@ -409,11 +409,7 @@ function App() {
             </span>
           </a>
 
-          <p className="logo-subtitle">
-            <span>MUSIC</span>
-            <b>•</b>
-            <span>PONIES</span>
-          </p>
+          
 
           <div className="search">
             <span className="search-icon">⌕</span>
