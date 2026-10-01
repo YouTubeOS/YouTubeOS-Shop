@@ -409,7 +409,7 @@ function App() {
             </span>
           </a>
 
-          
+
 
           <div className="search">
             <span className="search-icon">⌕</span>
@@ -508,9 +508,7 @@ function App() {
             YouTubeOS Shop
           </p>
 
-          <h1 className="hero-title">
-            Музыка, пони и всё интересное.
-          </h1>
+
 
           <p className="hero-text">
             Доставка по всей России и Европе.
