@@ -432,7 +432,9 @@ function App() {
                   type="button"
                   className="header-button"
                   onClick={() =>
-                    alert('Раздел «Мои заказы» временно обновляется.')
+                    alert(
+                      'Раздел «Мои заказы» временно обновляется.',
+                    )
                   }
                 >
                   Мои заказы
@@ -489,54 +491,6 @@ function App() {
           >
             Смотреть каталог
           </a>
-        </div>
-      </section>
-
-      <section className="category-showcase">
-        <div
-          className="category-card mlp-category"
-          onClick={() => {
-            setCategoryFilter('MLP')
-
-            document
-              .getElementById('catalog')
-              ?.scrollIntoView({
-                behavior: 'smooth',
-              })
-          }}
-        >
-          <span>🦄</span>
-
-          <h2>MLP</h2>
-
-          <p>
-            Коллекционные товары
-            <br />
-            для фанатов.
-          </p>
-        </div>
-
-        <div
-          className="category-card music-category"
-          onClick={() => {
-            setCategoryFilter('Музыка')
-
-            document
-              .getElementById('catalog')
-              ?.scrollIntoView({
-                behavior: 'smooth',
-              })
-          }}
-        >
-          <span>🎵</span>
-
-          <h2>Музыка</h2>
-
-          <p>
-            Всё для тех,
-            <br />
-            кто любит музыку.
-          </p>
         </div>
       </section>
 
