@@ -1989,3 +1989,78 @@ button {
     align-items: flex-start;
   }
 }
+/* FIX: Мои заказы */
+.orders-cart {
+  color: #171717 !important;
+}
+
+.orders-list {
+  color: #171717 !important;
+}
+
+.order-card {
+  color: #171717 !important;
+}
+
+.order-card-main {
+  display: block !important;
+  width: 100% !important;
+  padding: 18px !important;
+  border: 0 !important;
+  background: #fff !important;
+  color: #171717 !important;
+  text-align: left !important;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.order-card-main * {
+  color: inherit;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.order-card-top h3 {
+  color: #171717 !important;
+}
+
+.order-number-label {
+  color: #171717 !important;
+}
+
+.order-card-info span {
+  color: #171717 !important;
+}
+
+.order-card-info strong {
+  color: #171717 !important;
+}
+
+.order-card-bottom {
+  color: #171717 !important;
+}
+
+.order-expand {
+  color: #7651bd !important;
+}
+
+.order-status {
+  color: #7048b8 !important;
+}
+/* ТЕСТ ЗАКАЗОВ */
+.orders-list {
+  background: red !important;
+}
+
+.order-card {
+  background: yellow !important;
+  min-height: 200px !important;
+}
+
+.order-card-main {
+  background: lime !important;
+  min-height: 150px !important;
+}

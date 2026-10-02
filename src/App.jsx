@@ -19,6 +19,7 @@ function App() {
       if (!saved) return []
 
       const parsed = JSON.parse(saved)
+
       if (!Array.isArray(parsed)) return []
 
       return parsed.map((item) => ({
@@ -34,16 +35,10 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false)
   const [user, setUser] = useState(null)
 
-  const [myOrders, setMyOrders] = useState([])
-  const [ordersOpen, setOrdersOpen] = useState(false)
-  const [ordersLoading, setOrdersLoading] = useState(false)
-  const [expandedOrder, setExpandedOrder] = useState(null)
-
   const [authOpen, setAuthOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
 
-  const [orderSuccess, setOrderSuccess] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   async function loadProducts() {
@@ -89,30 +84,6 @@ function App() {
     }
 
     setIsAdmin(data?.role === 'admin')
-  }
-
-  async function loadMyOrders() {
-    if (!user?.id) return
-
-    setOrdersLoading(true)
-
-    const { data, error } = await supabase
-      .from('orders')
-      .select(`
-        *,
-        order_items(*)
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Ошибка загрузки заказов:', error)
-      setMyOrders([])
-    } else {
-      setMyOrders(data || [])
-    }
-
-    setOrdersLoading(false)
   }
 
   useEffect(() => {
@@ -247,7 +218,6 @@ function App() {
     )
   }
 
-  // Переход на официальную форму оплаты ЮMoney
   function goToYooMoneyPayment(orderNumber, total) {
     const form = document.createElement('form')
 
@@ -265,9 +235,11 @@ function App() {
 
     Object.entries(fields).forEach(([name, value]) => {
       const input = document.createElement('input')
+
       input.type = 'hidden'
       input.name = name
       input.value = value
+
       form.appendChild(input)
     })
 
@@ -277,6 +249,12 @@ function App() {
 
   async function checkout() {
     if (cart.length === 0 || checkoutLoading) return
+
+    if (!user) {
+      alert('Сначала войди в аккаунт')
+      setAuthOpen(true)
+      return
+    }
 
     setCheckoutLoading(true)
 
@@ -314,15 +292,15 @@ function App() {
       } = await supabase
         .from('orders')
         .insert({
-          user_id: user?.id || null,
+          user_id: user.id,
           order_number: orderNumber,
           status: 'pending',
           payment_status: 'pending',
           delivery_method: 'СДЭК',
           customer_name:
-            user?.user_metadata?.name || 'Покупатель',
+            user.user_metadata?.name || 'Покупатель',
           customer_phone: 'Не указан',
-          customer_email: user?.email || null,
+          customer_email: user.email || null,
           total,
         })
         .select()
@@ -364,8 +342,6 @@ function App() {
       }
 
       setCart([])
-
-      // Закрываем корзину и сразу отправляем покупателя на ЮMoney
       setCartOpen(false)
 
       goToYooMoneyPayment(orderNumber, total)
@@ -387,8 +363,6 @@ function App() {
     setUser(null)
     setIsAdmin(false)
     setAdminOpen(false)
-    setOrdersOpen(false)
-    setMyOrders([])
   }
 
   if (window.location.pathname === '/requisites') {
@@ -408,8 +382,6 @@ function App() {
               SHOP
             </span>
           </a>
-
-
 
           <div className="search">
             <span className="search-icon">⌕</span>
@@ -459,10 +431,9 @@ function App() {
                 <button
                   type="button"
                   className="header-button"
-                  onClick={() => {
-                    setOrdersOpen(true)
-                    loadMyOrders()
-                  }}
+                  onClick={() =>
+                    alert('Раздел «Мои заказы» временно обновляется.')
+                  }
                 >
                   Мои заказы
                 </button>
@@ -508,8 +479,6 @@ function App() {
             YouTubeOS Shop
           </p>
 
-
-
           <p className="hero-text">
             Доставка по всей России и Европе.
           </p>
@@ -537,6 +506,7 @@ function App() {
           }}
         >
           <span>🦄</span>
+
           <h2>MLP</h2>
 
           <p>
@@ -559,6 +529,7 @@ function App() {
           }}
         >
           <span>🎵</span>
+
           <h2>Музыка</h2>
 
           <p>
@@ -723,258 +694,6 @@ function App() {
           </p>
         </div>
       </footer>
-
-      {ordersOpen && (
-        <div
-          className="cart-overlay"
-          onClick={() => setOrdersOpen(false)}
-        >
-          <aside
-            className="cart orders-cart"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <div className="cart-header">
-              <div>
-                <p className="orders-label">
-                  ЛИЧНЫЙ КАБИНЕТ
-                </p>
-
-                <h2>Мои заказы</h2>
-              </div>
-
-              <button
-                type="button"
-                className="close-button"
-                onClick={() =>
-                  setOrdersOpen(false)
-                }
-              >
-                ×
-              </button>
-            </div>
-
-            {ordersLoading ? (
-              <div className="cart-empty">
-                <div className="loader"></div>
-
-                <h3>Загрузка заказов...</h3>
-              </div>
-            ) : myOrders.length === 0 ? (
-              <div className="cart-empty">
-                <div className="empty-icon">📦</div>
-
-                <h3>Заказов пока нет</h3>
-
-                <p>
-                  Здесь появятся твои покупки.
-                </p>
-              </div>
-            ) : (
-              <div className="orders-list">
-                {myOrders.map((order) => {
-                  const isExpanded =
-                    expandedOrder === order.id
-
-                  const itemsCount =
-                    order.order_items?.reduce(
-                      (sum, item) =>
-                        sum +
-                        Number(item.quantity || 0),
-                      0,
-                    ) || 0
-
-                  const statusText =
-                    order.status === 'pending'
-                      ? 'В обработке'
-                      : order.status
-
-                  return (
-                    <div
-                      className={`order-card ${
-                        isExpanded
-                          ? 'order-card-expanded'
-                          : ''
-                      }`}
-                      key={order.id}
-                    >
-                      <button
-                        type="button"
-                        className="order-card-main"
-                        onClick={() =>
-                          setExpandedOrder(
-                            isExpanded
-                              ? null
-                              : order.id,
-                          )
-                        }
-                      >
-                        <div className="order-card-top">
-                          <div>
-                            <span className="order-number-label">
-                              ЗАКАЗ
-                            </span>
-
-                            <h3>
-                              {order.order_number}
-                            </h3>
-                          </div>
-
-                          <span className="order-status">
-                            {statusText}
-                          </span>
-                        </div>
-
-                        <div className="order-card-info">
-                          <div>
-                            <span>Сумма</span>
-
-                            <strong>
-                              {Number(
-                                order.total || 0,
-                              ).toLocaleString(
-                                'ru-RU',
-                              )}{' '}
-                              ₽
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>Оплата</span>
-
-                            <strong
-                              className={
-                                order.payment_status ===
-                                'paid'
-                                  ? 'payment-paid'
-                                  : 'payment-pending'
-                              }
-                            >
-                              {order.payment_status ===
-                              'paid'
-                                ? '✓ Оплачено'
-                                : 'Ожидает оплаты'}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>Товары</span>
-
-                            <strong>
-                              {itemsCount} шт.
-                            </strong>
-                          </div>
-                        </div>
-
-                        <div className="order-card-bottom">
-                          <span>🚚 СДЭК</span>
-
-                          <span className="order-expand">
-                            {isExpanded
-                              ? 'Скрыть товары ↑'
-                              : 'Показать товары ↓'}
-                          </span>
-                        </div>
-                      </button>
-
-                      {isExpanded && (
-                        <div className="order-details">
-                          <div className="order-details-title">
-                            Товары в заказе
-                          </div>
-
-                          {order.order_items?.map(
-                            (item) => (
-                              <div
-                                className="order-product"
-                                key={item.id}
-                              >
-                                <div className="order-product-image">
-                                  {item.product_image ? (
-                                    <img
-                                      src={
-                                        item.product_image
-                                      }
-                                      alt={
-                                        item.product_name
-                                      }
-                                    />
-                                  ) : (
-                                    <span>♫</span>
-                                  )}
-                                </div>
-
-                                <div className="order-product-info">
-                                  <h4>
-                                    {item.product_name}
-                                  </h4>
-
-                                  <span>
-                                    {Number(
-                                      item.quantity || 0,
-                                    )}{' '}
-                                    шт. ×{' '}
-                                    {Number(
-                                      item.price || 0,
-                                    ).toLocaleString(
-                                      'ru-RU',
-                                    )}{' '}
-                                    ₽
-                                  </span>
-                                </div>
-
-                                <strong>
-                                  {(
-                                    Number(
-                                      item.price || 0,
-                                    ) *
-                                    Number(
-                                      item.quantity || 0,
-                                    )
-                                  ).toLocaleString(
-                                    'ru-RU',
-                                  )}{' '}
-                                  ₽
-                                </strong>
-                              </div>
-                            ),
-                          )}
-
-                          {order.cdek_track && (
-                            <div className="order-track">
-                              <span>
-                                🚚 Трек-номер СДЭК
-                              </span>
-
-                              <strong>
-                                {order.cdek_track}
-                              </strong>
-                            </div>
-                          )}
-
-                          <div className="order-details-total">
-                            <span>Итого</span>
-
-                            <strong>
-                              {Number(
-                                order.total || 0,
-                              ).toLocaleString(
-                                'ru-RU',
-                              )}{' '}
-                              ₽
-                            </strong>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </aside>
-        </div>
-      )}
 
       {authOpen && (
         <Auth
