@@ -640,14 +640,26 @@ function App() {
       </section>
 
       <footer className="footer">
-        <div>
-          <strong>YouTubeOS Shop</strong>
+  <div>
+    <strong>YouTubeOS Shop</strong>
 
-          <p>
-            © {new Date().getFullYear()} YouTubeOS Shop
-          </p>
-        </div>
-      </footer>
+    <p>
+      © {new Date().getFullYear()} YouTubeOS Shop
+    </p>
+  </div>
+
+  <div className="footer-support">
+    <strong>Поддержка</strong>
+
+    <a
+      href="https://t.me/YouTubeOS"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Telegram
+    </a>
+  </div>
+</footer>
 
       {authOpen && (
         <Auth
