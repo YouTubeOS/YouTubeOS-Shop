@@ -648,17 +648,14 @@ function App() {
     </p>
   </div>
 
-  <div className="footer-support">
-    <strong>Поддержка</strong>
-
-    <a
-      href="https://t.me/YouTubeOS"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Telegram
-    </a>
-  </div>
+  <a
+    href="https://t.me/YouTubeOS"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="header-button"
+  >
+    Поддержка
+  </a>
 </footer>
 
       {authOpen && (
