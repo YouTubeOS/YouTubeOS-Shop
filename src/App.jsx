@@ -38,10 +38,10 @@ function LegalPage({ type }) {
 
           <h3>4. Доставка</h3>
           <p>
-  Доставка товаров осуществляется через транспортную компанию СДЭК.
-  После отправки заказа покупателю предоставляется трек-номер для
-  отслеживания отправления.
-</p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
 
           <h3>5. Возврат</h3>
           <p>
@@ -69,10 +69,10 @@ function LegalPage({ type }) {
 
           <h3>Использование данных</h3>
           <p>
-  Полученные данные используются для работы сайта, обработки
-  заказов, оплаты, доставки и связи с покупателем. При необходимости
-  данные, необходимые для доставки, могут передаваться службе СДЭК.
-</p>
+            Полученные данные используются для работы сайта, обработки
+            заказов, оплаты, доставки и связи с покупателем. При необходимости
+            данные, необходимые для доставки, могут передаваться службе СДЭК.
+          </p>
 
           <h3>Защита данных</h3>
           <p>
@@ -89,10 +89,10 @@ function LegalPage({ type }) {
         <>
           <h3>Доставка</h3>
           <p>
-  Доставка товаров осуществляется через транспортную компанию СДЭК.
-  После отправки заказа покупателю предоставляется трек-номер для
-  отслеживания отправления.
-</p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
 
           <h3>Сроки доставки</h3>
           <p>
@@ -216,16 +216,35 @@ function LegalPage({ type }) {
   )
 }
 
-
 function App() {
+  const pathname = window.location.pathname
+
+  const catalogConfig = {
+    '/catalog/music': {
+      title: 'Музыка',
+      label: '🎵 МУЗЫКА',
+      category: 'Музыка',
+      description: 'Винил, музыка и коллекционные издания.',
+    },
+
+    '/catalog/new-year': {
+      title: 'Новогодние',
+      label: '🎄 НОВОГОДНИЕ',
+      category: 'Новогодние',
+      description: 'Праздничные товары и новинки к Новому году.',
+    },
+  }
+
+  const currentCatalog = catalogConfig[pathname]
+
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('Все')
 
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('YouTubeOS_Shop_cart')
+
       if (!saved) return []
 
       const parsed = JSON.parse(saved)
@@ -333,13 +352,13 @@ function App() {
         product.category?.toLowerCase().includes(text)
 
       const matchesCategory =
-        categoryFilter === 'Все' ||
+        !currentCatalog ||
         product.category?.toLowerCase() ===
-          categoryFilter.toLowerCase()
+          currentCatalog.category.toLowerCase()
 
       return matchesSearch && matchesCategory
     })
-  }, [products, search, categoryFilter])
+  }, [products, search, currentCatalog?.category])
 
   const cartCount = useMemo(() => {
     return cart.reduce(
@@ -575,8 +594,6 @@ function App() {
     setAdminOpen(false)
   }
 
-  const pathname = window.location.pathname
-
   if (pathname === '/requisites') {
     return <Requisites />
   }
@@ -595,6 +612,360 @@ function App() {
 
   if (pathname === '/returns') {
     return <LegalPage type="returns" />
+  }
+
+  if (!currentCatalog) {
+    return (
+      <div className="app">
+        <header className="header">
+          <div className="header-inner">
+            <a href="/" className="logo">
+              <span className="logo-main">
+                YOUTUBEOS
+              </span>
+
+              <span className="logo-shop">
+                SHOP
+              </span>
+            </a>
+
+            <div className="header-actions">
+              {isAdmin && (
+                <button
+                  type="button"
+                  className="header-button"
+                  onClick={() => setAdminOpen(true)}
+                >
+                  Админка
+                </button>
+              )}
+
+              {user ? (
+                <>
+                  <button
+                    type="button"
+                    className="header-button"
+                    onClick={() =>
+                      alert(
+                        'Раздел «Мои заказы» временно обновляется.',
+                      )
+                    }
+                  >
+                    Мои заказы
+                  </button>
+
+                  <button
+                    type="button"
+                    className="header-button"
+                    onClick={logout}
+                  >
+                    Выйти
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="header-button"
+                  onClick={() => setAuthOpen(true)}
+                >
+                  Войти
+                </button>
+              )}
+
+              <button
+                type="button"
+                className="cart-button"
+                onClick={() => setCartOpen(true)}
+              >
+                Корзина
+
+                {cartCount > 0 && (
+                  <span className="cart-count">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <section className="hero">
+          <div className="hero-content">
+            <p className="hero-label">
+              YouTubeOS Shop
+            </p>
+
+            <p className="hero-text">
+              Музыка, пони и всё интересное.
+            </p>
+
+            <a
+              href="#catalog"
+              className="hero-button"
+            >
+              Смотреть каталог
+            </a>
+          </div>
+        </section>
+
+        <section className="catalog" id="catalog">
+          <div className="catalog-top">
+            <div>
+              <p className="section-label">
+                КАТАЛОГ
+              </p>
+
+              <h2>Выбери каталог</h2>
+            </div>
+          </div>
+
+          <div className="products">
+            <a
+              href="/catalog/music"
+              className="product-card"
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              <div className="product-info">
+                <div className="category">
+                  🎵 МУЗЫКА
+                </div>
+
+                <h3>Музыка</h3>
+
+                <p>
+                  Винил, музыкальные издания и
+                  коллекционные товары.
+                </p>
+
+                <div className="product-bottom">
+                  <strong>
+                    Открыть каталог →
+                  </strong>
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="/catalog/new-year"
+              className="product-card"
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              <div className="product-info">
+                <div className="category">
+                  🎄 НОВОГОДНИЕ
+                </div>
+
+                <h3>Новогодние</h3>
+
+                <p>
+                  Праздничные товары и новинки к
+                  Новому году.
+                </p>
+
+                <div className="product-bottom">
+                  <strong>
+                    Открыть каталог →
+                  </strong>
+                </div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <footer className="footer">
+          <div>
+            <strong>YouTubeOS Shop</strong>
+
+            <p>
+              © {new Date().getFullYear()} YouTubeOS Shop
+            </p>
+          </div>
+
+          <div className="footer-links">
+            <a href="/offer">
+              Публичная оферта
+            </a>
+
+            <a href="/privacy">
+              Политика конфиденциальности
+            </a>
+
+            <a href="/delivery">
+              Доставка и оплата
+            </a>
+
+            <a href="/returns">
+              Возврат товара
+            </a>
+          </div>
+
+          <a
+            href="https://t.me/YouTubeOS"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="header-button"
+          >
+            Поддержка
+          </a>
+        </footer>
+
+        {authOpen && (
+          <Auth
+            onClose={() => {
+              setAuthOpen(false)
+              loadUser()
+            }}
+          />
+        )}
+
+        {adminOpen && (
+          <Admin
+            onClose={() => setAdminOpen(false)}
+            onProductsChanged={loadProducts}
+          />
+        )}
+
+        {cartOpen && (
+          <div
+            className="cart-overlay"
+            onClick={() => setCartOpen(false)}
+          >
+            <aside
+              className="cart"
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+            >
+              <div className="cart-header">
+                <h2>Корзина</h2>
+
+                <button
+                  type="button"
+                  className="close-button"
+                  onClick={() => setCartOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              {cart.length === 0 ? (
+                <div className="cart-empty">
+                  <h3>Корзина пуста</h3>
+
+                  <p>
+                    Добавь что-нибудь из каталога.
+                  </p>
+                </div>
+              ) : (
+                <div className="cart-items">
+                  {cart.map((item) => (
+                    <div
+                      className="cart-item"
+                      key={item.id}
+                    >
+                      {item.image_url && (
+                        <img
+                          className="cart-item-image"
+                          src={item.image_url}
+                          alt={item.name}
+                        />
+                      )}
+
+                      <div className="cart-item-info">
+                        <h3>{item.name}</h3>
+
+                        <strong>
+                          {Number(
+                            item.price || 0,
+                          ).toLocaleString(
+                            'ru-RU',
+                          )}{' '}
+                          ₽
+                        </strong>
+
+                        <div className="quantity">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              decreaseQuantity(
+                                item.id,
+                              )
+                            }
+                          >
+                            −
+                          </button>
+
+                          <span>
+                            {item.quantity}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              increaseQuantity(
+                                item.id,
+                              )
+                            }
+                          >
+                            +
+                          </button>
+
+                          <button
+                            type="button"
+                            className="remove"
+                            onClick={() =>
+                              removeFromCart(
+                                item.id,
+                              )
+                            }
+                          >
+                            Удалить
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {cart.length > 0 && (
+                <div className="cart-footer">
+                  <div className="total">
+                    <span>Итого</span>
+
+                    <strong>
+                      {cartTotal.toLocaleString(
+                        'ru-RU',
+                      )}{' '}
+                      ₽
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="checkout-button"
+                    onClick={checkout}
+                    disabled={checkoutLoading}
+                  >
+                    {checkoutLoading
+                      ? 'Оформляем...'
+                      : 'Оформить заказ'}
+                  </button>
+                </div>
+              )}
+            </aside>
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -706,18 +1077,18 @@ function App() {
       <section className="hero">
         <div className="hero-content">
           <p className="hero-label">
-            YouTubeOS Shop
+            {currentCatalog.label}
           </p>
 
           <p className="hero-text">
-            Доставка по всей России и Европе.
+            {currentCatalog.description}
           </p>
 
           <a
-            href="#catalog"
+            href="/"
             className="hero-button"
           >
-            Смотреть каталог
+            ← Все каталоги
           </a>
         </div>
       </section>
@@ -729,28 +1100,7 @@ function App() {
               КАТАЛОГ
             </p>
 
-            <h2>Наши товары</h2>
-
-            <div className="category-buttons">
-              {['Все', 'Музыка'].map(
-                (cat) => (
-                  <button
-                    type="button"
-                    key={cat}
-                    className={
-                      categoryFilter === cat
-                        ? 'active-category'
-                        : ''
-                    }
-                    onClick={() =>
-                      setCategoryFilter(cat)
-                    }
-                  >
-                    {cat}
-                  </button>
-                ),
-              )}
-            </div>
+            <h2>{currentCatalog.title}</h2>
           </div>
 
           <span className="product-count">
