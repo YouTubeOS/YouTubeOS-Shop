@@ -731,27 +731,15 @@ function App() {
 
             <h2>Наши товары</h2>
 
-            <div className="category-buttons">
-              {['Все', 'Музыка'].map(
-                (cat) => (
-                  <button
-                    type="button"
-                    key={cat}
-                    className={
-                      categoryFilter === cat
-                        ? 'active-category'
-                        : ''
-                    }
-                    onClick={() =>
-                      setCategoryFilter(cat)
-                    }
-                  >
-                    {cat}
-                  </button>
-                ),
-              )}
-            </div>
-          </div>
+            <div className="category-switcher">
+  <button
+    type="button"
+    className="category-button active"
+    onClick={() => setSelectedCategory('Музыка')}
+  >
+    🎵 Музыка
+  </button>
+</div>
 
           <span className="product-count">
             {filteredProducts.length} товаров
