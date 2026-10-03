@@ -204,16 +204,13 @@ function LegalPage({ type }) {
         </div>
 
         <a
-  href="https://t.me/YouTubeOS"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="telegram-link"
-  aria-label="Telegram"
->
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M21.5 3.5 18.2 20c-.25 1.17-.9 1.46-1.82.91l-5-3.68-2.41 2.32c-.27.27-.5.5-1.03.5l.37-5.1 9.28-8.38c.4-.37-.09-.58-.62-.21L5.5 13.6.57 12.05c-1.07-.34-1.09-1.07.22-1.58L20.05 3.1c.89-.33 1.67.2 1.45.4Z" />
-  </svg>
-</a>
+          href="https://t.me/YouTubeOS"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-button"
+        >
+          Поддержка
+        </a>
       </footer>
     </div>
   )
