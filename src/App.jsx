@@ -504,7 +504,7 @@ function App() {
             <h2>Наши товары</h2>
 
             <div className="category-buttons">
-              {['Все', 'Музыка', 'MLP'].map(
+              {['Все', 'Музыка'].map(
                 (cat) => (
                   <button
                     type="button"
