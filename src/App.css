@@ -76,22 +76,59 @@ button {
   transform: translateY(-2px);
 }
 
-.logo-main,
-.logo-shop {
-  display: inline-block;
-  color: #111;
-}
+/* Весь логотип левитирует одним целым */
 
 .logo-main {
-  animation: smoothMain 5s ease-in-out infinite;
+  display: inline-block;
+  position: relative;
+  color: #111;
+  animation: logoFloat 5s ease-in-out infinite;
 }
+
+/* Старые отдельные анимации отключены */
 
 .logo-shop {
-  animation: smoothShop 5s ease-in-out infinite;
-  animation-delay: 0.35s;
+  display: inline;
+  color: #111;
+  animation: none;
 }
 
-@keyframes smoothMain {
+/* Буквы с иконками */
+
+.logo-y,
+.logo-p {
+  position: relative;
+  display: inline-block;
+}
+
+/* Маленькие иконки */
+
+.mini-youtube,
+.mini-vinyl {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mini-youtube {
+  fill: #ff0000;
+}
+
+.mini-youtube polygon {
+  fill: #fff;
+}
+
+.mini-vinyl {
+  fill: #111;
+}
+
+/* Общая левитация */
+
+@keyframes logoFloat {
   0%,
   100% {
     transform: translateY(0);
@@ -99,17 +136,6 @@ button {
 
   50% {
     transform: translateY(-4px);
-  }
-}
-
-@keyframes smoothShop {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(4px);
   }
 }
 
@@ -312,8 +338,6 @@ button {
   opacity: 0.7;
 }
 
-/* ОБЫЧНЫЙ БЕЛЫЙ ЗАГОЛОВОК БЕЗ ВОЛНЫ */
-
 .hero-title {
   display: inline-block;
   margin: 0;
@@ -490,6 +514,7 @@ button {
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
 }
+
 /* =========================
    PRODUCT CARD
 ========================= */
@@ -726,6 +751,33 @@ button {
   align-items: center;
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.footer-links a:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
 /* =========================
    CART
 ========================= */
@@ -887,6 +939,7 @@ button {
 .checkout-button:hover {
   transform: translateY(-2px);
 }
+
 /* =========================
    AUTH
 ========================= */
@@ -1210,6 +1263,7 @@ button {
   text-align: center;
   font-size: 12px;
 }
+
 /* =========================
    SUCCESS ORDER
 ========================= */
@@ -1220,13 +1274,11 @@ button {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 9999;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   overflow-y: auto;
 }
 
@@ -1269,7 +1321,6 @@ button {
   border-radius: 25px;
   padding: 30px;
   position: relative;
-
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -1487,8 +1538,7 @@ button {
     gap: 6px;
   }
 
-  .logo-main,
-  .logo-shop {
+  .logo-main {
     font-size: 19px;
   }
 
@@ -1593,14 +1643,26 @@ button {
   .admin-delete-button {
     font-size: 11px;
   }
+
+  .mini-youtube,
+  .mini-vinyl {
+    width: 12px;
+    height: 12px;
+    top: -10px;
+  }
 }
+
+/* =========================
+   ORDER CHECK
+========================= */
+
 .order-check {
   max-width: 700px;
   margin: 60px auto;
   padding: 30px;
   border-radius: 24px;
   background: white;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
 }
 
 .order-check h2 {
@@ -1634,6 +1696,7 @@ button {
 .order-card h3 {
   margin-bottom: 15px;
 }
+
 .payment-qr img {
   width: 250px !important;
   height: 250px !important;
@@ -1641,6 +1704,7 @@ button {
   display: block;
   margin: 20px auto;
 }
+
 .success-overlay {
   overflow-y: auto;
   padding: 20px;
@@ -1650,24 +1714,18 @@ button {
   max-height: 90vh;
   overflow-y: auto;
 }
+
 .payment-qr img,
 .sbp-qr {
   width: 200px;
   height: 200px;
   object-fit: contain;
 }
-.success-overlay {
-  background: #ffffff !important;
-}
 
-.success-card {
-  background: #ffffff !important;
-  color: #111111 !important;
-}
 .success-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0,0,0,0.45) !important;
+  background: rgba(0, 0, 0, 0.45) !important;
   z-index: 99999 !important;
   display: flex !important;
   justify-content: center !important;
@@ -1684,12 +1742,14 @@ button {
   max-height: 90vh !important;
   overflow-y: auto !important;
 }
+
 /* =========================
    MY ORDERS
 ========================= */
 
 .orders-cart {
   width: min(560px, 94vw);
+  color: #171717 !important;
 }
 
 .orders-label {
@@ -1706,6 +1766,7 @@ button {
   gap: 14px;
   padding: 18px;
   overflow-y: auto;
+  color: #171717 !important;
 }
 
 .order-card {
@@ -1713,6 +1774,7 @@ button {
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 20px;
   background: #fff;
+  color: #171717 !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
   transition:
     transform 0.2s ease,
@@ -1730,13 +1792,25 @@ button {
 }
 
 .order-card-main {
-  width: 100%;
-  padding: 18px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
+  display: block !important;
+  width: 100% !important;
+  padding: 18px !important;
+  border: 0 !important;
+  background: #fff !important;
+  color: #171717 !important;
+  text-align: left !important;
   cursor: pointer;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.order-card-main * {
+  color: inherit;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .order-card-top {
@@ -1753,12 +1827,14 @@ button {
   font-weight: 800;
   letter-spacing: 1.2px;
   opacity: 0.4;
+  color: #171717 !important;
 }
 
 .order-card-top h3 {
   margin: 0;
   font-size: 19px;
   font-weight: 800;
+  color: #171717 !important;
 }
 
 .order-status {
@@ -1768,17 +1844,17 @@ button {
   font-weight: 800;
   white-space: nowrap;
   background: rgba(120, 80, 200, 0.1);
-  color: #7048b8;
+  color: #7048b8 !important;
 }
 
 .status-отправлен {
   background: rgba(50, 140, 220, 0.11);
-  color: #2475ad;
+  color: #2475ad !important;
 }
 
 .status-завершён {
   background: rgba(60, 170, 100, 0.12);
-  color: #29834c;
+  color: #29834c !important;
 }
 
 .order-card-info {
@@ -1800,19 +1876,21 @@ button {
   font-size: 10px;
   font-weight: 700;
   opacity: 0.45;
+  color: #171717 !important;
 }
 
 .order-card-info strong {
   display: block;
   font-size: 13px;
+  color: #171717 !important;
 }
 
 .payment-paid {
-  color: #269052;
+  color: #269052 !important;
 }
 
 .payment-pending {
-  color: #b47a1e;
+  color: #b47a1e !important;
 }
 
 .order-card-bottom {
@@ -1822,10 +1900,11 @@ button {
   margin-top: 15px;
   font-size: 12px;
   font-weight: 700;
+  color: #171717 !important;
 }
 
 .order-expand {
-  color: #7651bd;
+  color: #7651bd !important;
 }
 
 .order-details {
@@ -1961,7 +2040,7 @@ button {
   }
 
   .order-card-main {
-    padding: 14px;
+    padding: 14px !important;
   }
 
   .order-card-top {
@@ -1987,160 +2066,5 @@ button {
   .order-track {
     flex-direction: column;
     align-items: flex-start;
-  }
-}
-/* FIX: Мои заказы */
-.orders-cart {
-  color: #171717 !important;
-}
-
-.orders-list {
-  color: #171717 !important;
-}
-
-.order-card {
-  color: #171717 !important;
-}
-
-.order-card-main {
-  display: block !important;
-  width: 100% !important;
-  padding: 18px !important;
-  border: 0 !important;
-  background: #fff !important;
-  color: #171717 !important;
-  text-align: left !important;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.order-card-main * {
-  color: inherit;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.order-card-top h3 {
-  color: #171717 !important;
-}
-
-.order-number-label {
-  color: #171717 !important;
-}
-
-.order-card-info span {
-  color: #171717 !important;
-}
-
-.order-card-info strong {
-  color: #171717 !important;
-}
-
-.order-card-bottom {
-  color: #171717 !important;
-}
-
-.order-expand {
-  color: #7651bd !important;
-}
-
-.order-status {
-  color: #7048b8 !important;
-}
-/* ТЕСТ ЗАКАЗОВ */
-.orders-list {
-  background: red !important;
-}
-
-.order-card {
-  background: yellow !important;
-  min-height: 200px !important;
-}
-
-.order-card-main {
-  background: lime !important;
-  min-height: 150px !important;
-}
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.footer-links a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #111111;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.footer-links a:hover {
-  background: #f0f0f0;
-  transform: translateY(-1px);
-}
-
-.footer-links a:hover {
-  background: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1px);
-}
-.shop-logo {
-  display: inline-flex;
-  animation: shopLogoFloat 3s ease-in-out infinite;
-}
-
-.logo-word {
-  display: inline-flex;
-  align-items: center;
-  font-weight: 800;
-  position: relative;
-}
-
-.logo-y,
-.logo-p {
-  position: relative;
-  display: inline-block;
-}
-
-.mini-youtube,
-.mini-vinyl {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.mini-youtube {
-  fill: #ff0000;
-}
-
-.mini-youtube polygon {
-  fill: white;
-}
-
-.mini-vinyl {
-  fill: #111;
-}
-
-@keyframes shopLogoFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-5px);
   }
 }
