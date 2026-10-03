@@ -2095,3 +2095,52 @@ button {
   background: rgba(255, 255, 255, 0.16);
   transform: translateY(-1px);
 }
+.shop-logo {
+  display: inline-flex;
+  animation: shopLogoFloat 3s ease-in-out infinite;
+}
+
+.logo-word {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  position: relative;
+}
+
+.logo-y,
+.logo-p {
+  position: relative;
+  display: inline-block;
+}
+
+.mini-youtube,
+.mini-vinyl {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mini-youtube {
+  fill: #ff0000;
+}
+
+.mini-youtube polygon {
+  fill: white;
+}
+
+.mini-vinyl {
+  fill: #111;
+}
+
+@keyframes shopLogoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}

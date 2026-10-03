@@ -1,56 +1,348 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './supabase'
+import Auth from './Auth'
+import Admin from './Admin'
+import Requisites from './Requisites'
+import './App.css'
 
+const YOOMONEY_WALLET = '4100119639377973'
 
-function Admin({
-  onClose,
-  onProductsChanged,
-}) {
+function ShopLogo() {
+  return (
+    <a href="/" className="logo">
+      <span
+        className="logo-main"
+        style={{
+          position: 'relative',
+          display: 'inline-block',
+        }}
+      >
+        <span
+          style={{
+            position: 'relative',
+            display: 'inline-block',
+          }}
+        >
+          Y
 
+          <svg
+            viewBox="0 0 24 17"
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              width: '14px',
+              height: '10px',
+              top: '-9px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <rect
+              width="24"
+              height="17"
+              rx="4"
+              fill="#ff0000"
+            />
+            <polygon
+              points="10,4.5 10,12.5 17,8.5"
+              fill="#ffffff"
+            />
+          </svg>
+        </span>
+
+        <span>ouTubeOS Sho</span>
+
+        <span
+          style={{
+            position: 'relative',
+            display: 'inline-block',
+          }}
+        >
+          p
+
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              width: '14px',
+              height: '14px',
+              top: '-11px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="11"
+              fill="#111111"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="3.2"
+              fill="#ffffff"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="1"
+              fill="#111111"
+            />
+          </svg>
+        </span>
+      </span>
+    </a>
+  )
+}
+
+function LegalPage({ type }) {
+  const pages = {
+    offer: {
+      title: 'Публичная оферта',
+      text: (
+        <>
+          <p>
+            Настоящая страница содержит основные условия продажи товаров
+            через YouTubeOS Shop.
+          </p>
+
+          <h3>1. Общие положения</h3>
+          <p>
+            YouTubeOS Shop предоставляет информацию о товарах, их стоимости,
+            наличии, способах оплаты и доставки.
+          </p>
+
+          <h3>2. Заказ товара</h3>
+          <p>
+            Покупатель оформляет заказ через сайт. После оформления заказа
+            информация о заказе сохраняется в системе магазина.
+          </p>
+
+          <h3>3. Оплата</h3>
+          <p>
+            Оплата производится способом, указанным на странице оформления
+            заказа.
+          </p>
+
+          <h3>4. Доставка</h3>
+          <p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
+
+          <h3>5. Возврат</h3>
+          <p>
+            Условия возврата товара определяются действующим
+            законодательством и правилами магазина.
+          </p>
+        </>
+      ),
+    },
+
+    privacy: {
+      title: 'Политика конфиденциальности',
+      text: (
+        <>
+          <p>
+            YouTubeOS Shop уважает конфиденциальность пользователей сайта.
+          </p>
+
+          <h3>Какие данные могут использоваться</h3>
+          <p>
+            Для работы магазина могут обрабатываться данные, необходимые
+            для регистрации, оформления заказа, связи с покупателем и
+            доставки товара.
+          </p>
+
+          <h3>Использование данных</h3>
+          <p>
+            Полученные данные используются для работы сайта, обработки
+            заказов, оплаты, доставки и связи с покупателем. При необходимости
+            данные, необходимые для доставки, могут передаваться службе СДЭК.
+          </p>
+
+          <h3>Защита данных</h3>
+          <p>
+            YouTubeOS Shop принимает разумные меры для защиты информации
+            пользователей от несанкционированного доступа.
+          </p>
+        </>
+      ),
+    },
+
+    delivery: {
+      title: 'Доставка и оплата',
+      text: (
+        <>
+          <h3>Доставка</h3>
+          <p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
+
+          <h3>Сроки доставки</h3>
+          <p>
+            Срок доставки зависит от выбранной службы доставки,
+            направления и наличия товара.
+          </p>
+
+          <h3>Оплата</h3>
+          <p>
+            Доступный способ оплаты отображается при оформлении заказа.
+          </p>
+
+          <h3>Стоимость доставки</h3>
+          <p>
+            Стоимость доставки зависит от выбранного способа и
+            направления доставки.
+          </p>
+        </>
+      ),
+    },
+
+    returns: {
+      title: 'Возврат товара',
+      text: (
+        <>
+          <p>
+            Возврат и обмен товаров осуществляются в соответствии
+            с применимым законодательством и условиями продажи.
+          </p>
+
+          <h3>Если товар повреждён</h3>
+          <p>
+            При получении повреждённого товара рекомендуется сохранить
+            упаковку и связаться с поддержкой YouTubeOS Shop.
+          </p>
+
+          <h3>Если пришёл другой товар</h3>
+          <p>
+            Если полученный товар не соответствует заказу, необходимо
+            обратиться в поддержку магазина для решения вопроса.
+          </p>
+
+          <h3>Связь с магазином</h3>
+          <p>
+            По вопросам возврата можно обратиться в поддержку:
+          </p>
+
+          <p>
+            <a
+              href="https://t.me/YouTubeOS"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Telegram: @YouTubeOS
+            </a>
+          </p>
+        </>
+      ),
+    },
+  }
+
+  const page = pages[type]
+
+  if (!page) {
+    return null
+  }
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="header-inner">
+          <ShopLogo />
+        </div>
+      </header>
+
+      <main className="legal-page">
+        <div className="legal-page-inner">
+          <a href="/" className="legal-back">
+            ← Вернуться в магазин
+          </a>
+
+          <p className="section-label">
+            YOUTUBEOS SHOP
+          </p>
+
+          <h1>{page.title}</h1>
+
+          <div className="legal-content">
+            {page.text}
+          </div>
+        </div>
+      </main>
+
+      <footer className="footer">
+        <div>
+          <strong>YouTubeOS Shop</strong>
+
+          <p>
+            © {new Date().getFullYear()} YouTubeOS Shop
+          </p>
+        </div>
+
+        <a
+          href="https://t.me/YouTubeOS"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-button"
+        >
+          Поддержка
+        </a>
+      </footer>
+    </div>
+  )
+}
+
+function App() {
   const [products, setProducts] = useState([])
-  const [orders, setOrders] = useState([])
-
   const [loading, setLoading] = useState(true)
-  const [ordersLoading, setOrdersLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('Все')
 
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [price, setPrice] = useState('')
-  const [category, setCategory] = useState('')
-  const [stock, setStock] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('YouTubeOS_Shop_cart')
+      if (!saved) return []
 
-  const [message, setMessage] = useState('')
-  const [saving, setSaving] = useState(false)
+      const parsed = JSON.parse(saved)
 
-  const [openOrder, setOpenOrder] = useState(null)
+      if (!Array.isArray(parsed)) return []
 
-  const [trackNumbers, setTrackNumbers] = useState({})
+      return parsed.map((item) => ({
+        ...item,
+        price: Number(item.price) || 0,
+        quantity: Math.max(1, Number(item.quantity) || 1),
+      }))
+    } catch {
+      return []
+    }
+  })
 
-  const [editingProduct, setEditingProduct] = useState(null)
+  const [cartOpen, setCartOpen] = useState(false)
+  const [user, setUser] = useState(null)
 
+  const [authOpen, setAuthOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(false)
 
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   async function loadProducts() {
-
     setLoading(true)
 
-    const {
-      data,
-      error
-    } = await supabase
+    const { data, error } = await supabase
       .from('products')
       .select('*')
-      .order(
-        'created_at',
-        {
-          ascending:false
-        }
-      )
+      .order('created_at', { ascending: false })
 
-
-    if(error){
-      setMessage(error.message)
+    if (error) {
+      console.error('Ошибка загрузки товаров:', error)
+      setProducts([])
     } else {
       setProducts(data || [])
     }
@@ -58,931 +350,782 @@ function Admin({
     setLoading(false)
   }
 
-
-
-
-  async function loadOrders(){
-
-    setOrdersLoading(true)
-
+  async function loadUser() {
     const {
-      data,
-      error
-    } = await supabase
-      .from('orders')
-      .select(`
-        *,
-        order_items(*)
-      `)
-      .order(
-        'created_at',
-        {
-          ascending:false
-        }
-      )
+      data: { user: currentUser },
+    } = await supabase.auth.getUser()
 
+    setUser(currentUser || null)
 
-    if(error){
-      setMessage(error.message)
-    } else {
-      setOrders(data || [])
-    }
-
-    setOrdersLoading(false)
-
-  }
-
-
-
-
-  useEffect(()=>{
-
-    loadProducts()
-    loadOrders()
-
-  },[])
-
-
-
-
-
-  async function updateOrderStatus(
-    id,
-    status
-  ){
-
-    const {
-      error
-    } = await supabase
-      .from('orders')
-      .update({
-        status
-      })
-      .eq(
-        'id',
-        id
-      )
-
-
-    if(error){
-      alert(error.message)
+    if (!currentUser) {
+      setIsAdmin(false)
       return
     }
 
-
-    loadOrders()
-
-  }
-
-
-
-
-
-  async function saveTrack(id){
-
-    const track =
-      trackNumbers[id]
-
-
-    const {
-      error
-    } = await supabase
-      .from('orders')
-      .update({
-        cdek_track:track
-      })
-      .eq(
-        'id',
-        id
-      )
-
-
-    if(error){
-      alert(error.message)
-      return
-    }
-
-
-    alert(
-      'Трек сохранён ✅'
-    )
-
-
-    loadOrders()
-
-  }
-    async function addProduct(e){
-
-    e.preventDefault()
-
-    if(saving) return
-
-    setSaving(true)
-
-
-    const {
-      error
-    } = await supabase
-      .from('products')
-      .insert({
-
-        name:name.trim(),
-
-        description:
-          description.trim() || null,
-
-        price:Number(price),
-
-        category:
-          category.trim() || null,
-
-        stock:Number(stock),
-
-        image_url:
-          imageUrl.trim() || null
-
-      })
-
-
-    if(error){
-
-      setMessage(error.message)
-
-      setSaving(false)
-
-      return
-    }
-
-
-
-    setName('')
-    setDescription('')
-    setPrice('')
-    setCategory('')
-    setStock('')
-    setImageUrl('')
-
-
-    setMessage(
-      'Товар добавлен ✅'
-    )
-
-
-    loadProducts()
-
-
-    if(onProductsChanged){
-      onProductsChanged()
-    }
-
-
-    setSaving(false)
-
-  }
-
-
-
-
-
-  async function updateProduct(){
-
-    const {
-      error
-    } = await supabase
-      .from('products')
-      .update({
-
-        name:
-          editingProduct.name,
-
-        description:
-          editingProduct.description,
-
-        price:
-          Number(editingProduct.price),
-
-        category:
-          editingProduct.category,
-
-        stock:
-          Number(editingProduct.stock),
-
-        image_url:
-          editingProduct.image_url
-
-      })
-      .eq(
-        'id',
-        editingProduct.id
-      )
-
-
-    if(error){
-
-      alert(error.message)
-
-      return
-    }
-
-
-
-    setEditingProduct(null)
-
-
-    await loadProducts()
-
-
-    if(onProductsChanged){
-      onProductsChanged()
-    }
-
-
-  }
-
-
-
-
-
-  async function deleteProduct(id){
-
-
-    if(!confirm(
-      'Удалить товар?'
-    )) return
-
-
-
-    const {
-      error
-    } = await supabase
-      .from('products')
-      .delete()
-      .eq(
-        'id',
-        id
-      )
-
-
-    if(error){
-
-      alert(error.message)
-
-      return
-    }
-
-
-    loadProducts()
-
-
-    if(onProductsChanged){
-      onProductsChanged()
-    }
-
-
-  }
-
-
-
-
-
-return (
-
-<div className="admin-overlay">
-
-<div className="admin-panel">
-
-
-<div className="admin-header">
-
-
-<div>
-
-<p className="section-label">
-PONY&MUSIC
-</p>
-
-
-<h2>
-Админка
-</h2>
-
-
-</div>
-
-
-<button
-className="close-button"
-onClick={onClose}
->
-×
-</button>
-
-
-</div>
-
-
-
-<div className="admin-content">
-
-
-<section>
-
-<p className="section-label">
-ДОБАВИТЬ ТОВАР
-</p>
-
-
-<form
-className="admin-form"
-onSubmit={addProduct}
->
-
-
-<input
-placeholder="Название"
-value={name}
-onChange={
-e=>setName(e.target.value)
-}
-required
-/>
-
-
-<textarea
-placeholder="Описание"
-value={description}
-onChange={
-e=>setDescription(e.target.value)
-}
-/>
-
-
-<input
-type="number"
-placeholder="Цена"
-value={price}
-onChange={
-e=>setPrice(e.target.value)
-}
-required
-/>
-
-
-<input
-type="number"
-placeholder="Количество"
-value={stock}
-onChange={
-e=>setStock(e.target.value)
-}
-required
-/>
-
-
-<input
-placeholder="Категория"
-value={category}
-onChange={
-e=>setCategory(e.target.value)
-}
-/>
-
-
-<input
-placeholder="Ссылка изображения"
-value={imageUrl}
-onChange={
-e=>setImageUrl(e.target.value)
-}
-/>
-
-
-{message &&
-
-<div className="admin-message">
-{message}
-</div>
-
-}
-
-
-<button
-className="admin-add-button"
-disabled={saving}
->
-
-{
-saving
-?
-'Добавление...'
-:
-'Добавить товар'
-}
-
-</button>
-
-
-</form>
-
-
-</section>
-<section className="admin-list-section">
-
-<p className="section-label">
-ЗАКАЗЫ
-</p>
-
-
-{
-ordersLoading ?
-
-<div className="admin-empty">
-Загрузка заказов...
-</div>
-
-:
-
-orders.length===0 ?
-
-<div className="admin-empty">
-Заказов нет
-</div>
-
-:
-
-<div className="admin-products">
-
-
-{
-orders.map(order=>(
-
-
-<div
-className="admin-product"
-key={order.id}
->
-
-
-<div className="admin-product-info">
-
-
-<strong>
-📦 {order.order_number}
-</strong>
-
-
-<span>
-{order.total} ₽
-</span>
-
-
-<small>
-👤 {order.customer_name}
-</small>
-
-
-<small>
-📧 {order.customer_email || 'нет'}
-</small>
-
-
-<small>
-  💳 {order.payment_status === 'paid'
-    ? 'Оплачено'
-    : 'Ожидает оплаты'}
-</small>
-
-<button
-  type="button"
-  onClick={async () => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ payment_status: 'paid' })
-      .eq('id', order.id)
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', currentUser.id)
+      .single()
 
     if (error) {
-      alert('Ошибка обновления оплаты')
-      console.error(error)
+      console.error('Ошибка проверки роли:', error)
+      setIsAdmin(false)
       return
     }
 
-    alert('Оплата отмечена как оплаченная')
-    loadOrders()
-  }}
->
-  💰 Оплачено
-</button>
-
-<small>
-  Статус: {
-    order.status === 'В обработке'
-      ? 'В обработке'
-      : order.status === 'Отправлен'
-        ? 'Отправлен'
-        : order.status === 'Завершён'
-          ? 'Завершён'
-          : order.status
+    setIsAdmin(data?.role === 'admin')
   }
-</small>
 
+  useEffect(() => {
+    loadProducts()
+    loadUser()
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      loadUser()
+    })
 
-<div className="order-buttons">
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
 
-<button
-onClick={() =>
-updateOrderStatus(
-order.id,
-'В обработке'
-)
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        'YouTubeOS_Shop_cart',
+        JSON.stringify(cart),
+      )
+    } catch (error) {
+      console.error('Ошибка сохранения корзины:', error)
+    }
+  }, [cart])
+
+  const filteredProducts = useMemo(() => {
+    const text = search.trim().toLowerCase()
+
+    return products.filter((product) => {
+      const matchesSearch =
+        !text ||
+        product.name?.toLowerCase().includes(text) ||
+        product.description?.toLowerCase().includes(text) ||
+        product.category?.toLowerCase().includes(text)
+
+      const matchesCategory =
+        categoryFilter === 'Все' ||
+        product.category?.toLowerCase() ===
+          categoryFilter.toLowerCase()
+
+      return matchesSearch && matchesCategory
+    })
+  }, [products, search, categoryFilter])
+
+  const cartCount = useMemo(() => {
+    return cart.reduce(
+      (sum, item) => sum + Number(item.quantity || 0),
+      0,
+    )
+  }, [cart])
+
+  const cartTotal = useMemo(() => {
+    return cart.reduce(
+      (sum, item) =>
+        sum +
+        Number(item.price || 0) *
+          Number(item.quantity || 0),
+      0,
+    )
+  }, [cart])
+
+  function addToCart(product) {
+    if (!product?.id) return
+
+    setCart((current) => {
+      const existing = current.find(
+        (item) => String(item.id) === String(product.id),
+      )
+
+      if (existing) {
+        return current.map((item) =>
+          String(item.id) === String(product.id)
+            ? {
+                ...item,
+                quantity: Number(item.quantity || 0) + 1,
+              }
+            : item,
+        )
+      }
+
+      return [
+        ...current,
+        {
+          id: product.id,
+          name: product.name || 'Товар',
+          price: Number(product.price) || 0,
+          image_url: product.image_url || '',
+          quantity: 1,
+        },
+      ]
+    })
+
+    setCartOpen(true)
+  }
+
+  function increaseQuantity(id) {
+    setCart((current) =>
+      current.map((item) =>
+        String(item.id) === String(id)
+          ? {
+              ...item,
+              quantity: Number(item.quantity || 0) + 1,
+            }
+          : item,
+      ),
+    )
+  }
+
+  function decreaseQuantity(id) {
+    setCart((current) =>
+      current
+        .map((item) =>
+          String(item.id) === String(id)
+            ? {
+                ...item,
+                quantity: Number(item.quantity || 0) - 1,
+              }
+            : item,
+        )
+        .filter((item) => item.quantity > 0),
+    )
+  }
+
+  function removeFromCart(id) {
+    setCart((current) =>
+      current.filter(
+        (item) => String(item.id) !== String(id),
+      ),
+    )
+  }
+
+  function goToYooMoneyPayment(orderNumber, total) {
+    const form = document.createElement('form')
+
+    form.method = 'POST'
+    form.action = 'https://yoomoney.ru/quickpay/confirm'
+    form.style.display = 'none'
+
+    const fields = {
+      receiver: YOOMONEY_WALLET,
+      'quickpay-form': 'button',
+      paymentType: 'AC',
+      sum: Number(total).toFixed(2),
+      label: orderNumber,
+    }
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement('input')
+
+      input.type = 'hidden'
+      input.name = name
+      input.value = value
+
+      form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+  }
+
+  async function checkout() {
+    if (cart.length === 0 || checkoutLoading) return
+
+    if (!user) {
+      alert('Сначала войди в аккаунт')
+      setAuthOpen(true)
+      return
+    }
+
+    setCheckoutLoading(true)
+
+    try {
+      for (const item of cart) {
+        const { data: product, error } = await supabase
+          .from('products')
+          .select('stock, name')
+          .eq('id', item.id)
+          .single()
+
+        if (error) throw error
+
+        if (Number(product.stock) < Number(item.quantity)) {
+          alert(`Недостаточно товара: ${product.name}`)
+          return
+        }
+      }
+
+      const orderNumber = `PM-${Date.now()
+        .toString()
+        .slice(-6)}`
+
+      const total = cart.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.price || 0) *
+            Number(item.quantity || 0),
+        0,
+      )
+
+      const {
+        data: order,
+        error: orderError,
+      } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          order_number: orderNumber,
+          status: 'pending',
+          payment_status: 'pending',
+          delivery_method: 'СДЭК',
+          customer_name:
+            user.user_metadata?.name || 'Покупатель',
+          customer_phone: 'Не указан',
+          customer_email: user.email || null,
+          total,
+        })
+        .select()
+        .single()
+
+      if (orderError) throw orderError
+
+      const items = cart.map((item) => ({
+        order_id: order.id,
+        product_id: item.id,
+        product_name: item.name,
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+      }))
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(items)
+
+      if (itemsError) throw itemsError
+
+      for (const item of cart) {
+        const { data: product } = await supabase
+          .from('products')
+          .select('stock')
+          .eq('id', item.id)
+          .single()
+
+        await supabase
+          .from('products')
+          .update({
+            stock: Math.max(
+              0,
+              Number(product.stock) -
+                Number(item.quantity),
+            ),
+          })
+          .eq('id', item.id)
+      }
+
+      setCart([])
+      setCartOpen(false)
+
+      goToYooMoneyPayment(orderNumber, total)
+    } catch (error) {
+      console.error('Ошибка оформления:', error)
+
+      alert(
+        error.message ||
+          'Ошибка оформления заказа',
+      )
+    } finally {
+      setCheckoutLoading(false)
+    }
+  }
+
+  async function logout() {
+    await supabase.auth.signOut()
+
+    setUser(null)
+    setIsAdmin(false)
+    setAdminOpen(false)
+  }
+
+  const pathname = window.location.pathname
+
+  if (pathname === '/requisites') {
+    return <Requisites />
+  }
+
+  if (pathname === '/offer') {
+    return <LegalPage type="offer" />
+  }
+
+  if (pathname === '/privacy') {
+    return <LegalPage type="privacy" />
+  }
+
+  if (pathname === '/delivery') {
+    return <LegalPage type="delivery" />
+  }
+
+  if (pathname === '/returns') {
+    return <LegalPage type="returns" />
+  }
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="header-inner">
+          <ShopLogo />
+
+          <div className="search">
+            <span className="search-icon">⌕</span>
+
+            <input
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  document
+                    .getElementById('catalog')
+                    ?.scrollIntoView({
+                      behavior: 'smooth',
+                    })
+                }
+              }}
+              placeholder="Поиск товаров"
+            />
+
+            {search && (
+              <button
+                type="button"
+                className="clear-search"
+                onClick={() => setSearch('')}
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          <div className="header-actions">
+            {isAdmin && (
+              <button
+                type="button"
+                className="header-button"
+                onClick={() => setAdminOpen(true)}
+              >
+                Админка
+              </button>
+            )}
+
+            {user ? (
+              <>
+                <button
+                  type="button"
+                  className="header-button"
+                  onClick={() =>
+                    alert(
+                      'Раздел «Мои заказы» временно обновляется.',
+                    )
+                  }
+                >
+                  Мои заказы
+                </button>
+
+                <button
+                  type="button"
+                  className="header-button"
+                  onClick={logout}
+                >
+                  Выйти
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="header-button"
+                onClick={() => setAuthOpen(true)}
+              >
+                Войти
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="cart-button"
+              onClick={() => setCartOpen(true)}
+            >
+              Корзина
+
+              {cartCount > 0 && (
+                <span className="cart-count">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section className="hero">
+        <div className="hero-content">
+          <p className="hero-label">
+            YouTubeOS Shop
+          </p>
+
+          <p className="hero-text">
+            Доставка по всей России и Европе.
+          </p>
+
+          <a
+            href="#catalog"
+            className="hero-button"
+          >
+            Смотреть каталог
+          </a>
+        </div>
+      </section>
+
+      <section className="catalog" id="catalog">
+        <div className="catalog-top">
+          <div>
+            <p className="section-label">
+              КАТАЛОГ
+            </p>
+
+            <h2>Наши товары</h2>
+
+            <div className="category-buttons">
+              {['Все', 'Музыка'].map(
+                (cat) => (
+                  <button
+                    type="button"
+                    key={cat}
+                    className={
+                      categoryFilter === cat
+                        ? 'active-category'
+                        : ''
+                    }
+                    onClick={() =>
+                      setCategoryFilter(cat)
+                    }
+                  >
+                    {cat}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+
+          <span className="product-count">
+            {filteredProducts.length} товаров
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="empty">
+            <div className="loader"></div>
+
+            <h3>Загрузка товаров</h3>
+
+            <p>Подожди немного...</p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="empty">
+            <div className="empty-icon">♫</div>
+
+            <h3>
+              {search
+                ? 'Ничего не найдено'
+                : 'Пока нет товаров'}
+            </h3>
+
+            <p>
+              {search
+                ? 'Попробуй изменить запрос.'
+                : 'Товары скоро появятся здесь.'}
+            </p>
+
+            {search && (
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setSearch('')}
+              >
+                Сбросить поиск
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="products">
+            {filteredProducts.map((product) => (
+              <article
+                className="product-card"
+                key={product.id}
+              >
+                <div className="product-image">
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                    />
+                  ) : (
+                    <div className="no-image">
+                      ♫
+                    </div>
+                  )}
+
+                  {Number(product.stock) <= 0 && (
+                    <div className="sold-out">
+                      Нет в наличии
+                    </div>
+                  )}
+                </div>
+
+                <div className="product-info">
+                  <div className="category">
+                    {product.category || 'ТОВАР'}
+                  </div>
+
+                  <h3>{product.name}</h3>
+
+                  <p>
+                    {product.description || ''}
+                  </p>
+
+                  {Number(product.stock) > 0 ? (
+                    <small className="stock-info">
+                      Осталось: {product.stock} шт.
+                    </small>
+                  ) : (
+                    <small className="stock-empty">
+                      Нет в наличии
+                    </small>
+                  )}
+
+                  <div className="product-bottom">
+                    <strong>
+                      {Number(
+                        product.price || 0,
+                      ).toLocaleString('ru-RU')}{' '}
+                      ₽
+                    </strong>
+
+                    <button
+                      type="button"
+                      className="add-button"
+                      disabled={
+                        Number(product.stock) <= 0
+                      }
+                      onClick={() =>
+                        addToCart(product)
+                      }
+                    >
+                      В корзину
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <footer className="footer">
+        <div>
+          <strong>YouTubeOS Shop</strong>
+
+          <p>
+            © {new Date().getFullYear()} YouTubeOS Shop
+          </p>
+        </div>
+
+        <div className="footer-links">
+          <a href="/offer">
+            Публичная оферта
+          </a>
+
+          <a href="/privacy">
+            Политика конфиденциальности
+          </a>
+
+          <a href="/delivery">
+            Доставка и оплата
+          </a>
+
+          <a href="/returns">
+            Возврат товара
+          </a>
+        </div>
+
+        <a
+          href="https://t.me/YouTubeOS"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-button"
+        >
+          Поддержка
+        </a>
+      </footer>
+
+      {authOpen && (
+        <Auth
+          onClose={() => {
+            setAuthOpen(false)
+            loadUser()
+          }}
+        />
+      )}
+
+      {adminOpen && (
+        <Admin
+          onClose={() => setAdminOpen(false)}
+          onProductsChanged={loadProducts}
+        />
+      )}
+
+      {cartOpen && (
+        <div
+          className="cart-overlay"
+          onClick={() => setCartOpen(false)}
+        >
+          <aside
+            className="cart"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="cart-header">
+              <h2>Корзина</h2>
+
+              <button
+                type="button"
+                className="close-button"
+                onClick={() => setCartOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            {cart.length === 0 ? (
+              <div className="cart-empty">
+                <h3>Корзина пуста</h3>
+
+                <p>
+                  Добавь что-нибудь из каталога.
+                </p>
+              </div>
+            ) : (
+              <div className="cart-items">
+                {cart.map((item) => (
+                  <div
+                    className="cart-item"
+                    key={item.id}
+                  >
+                    {item.image_url && (
+                      <img
+                        className="cart-item-image"
+                        src={item.image_url}
+                        alt={item.name}
+                      />
+                    )}
+
+                    <div className="cart-item-info">
+                      <h3>{item.name}</h3>
+
+                      <strong>
+                        {Number(
+                          item.price || 0,
+                        ).toLocaleString(
+                          'ru-RU',
+                        )}{' '}
+                        ₽
+                      </strong>
+
+                      <div className="quantity">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            decreaseQuantity(
+                              item.id,
+                            )
+                          }
+                        >
+                          −
+                        </button>
+
+                        <span>
+                          {item.quantity}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            increaseQuantity(
+                              item.id,
+                            )
+                          }
+                        >
+                          +
+                        </button>
+
+                        <button
+                          type="button"
+                          className="remove"
+                          onClick={() =>
+                            removeFromCart(
+                              item.id,
+                            )
+                          }
+                        >
+                          Удалить
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {cart.length > 0 && (
+              <div className="cart-footer">
+                <div className="total">
+                  <span>Итого</span>
+
+                  <strong>
+                    {cartTotal.toLocaleString(
+                      'ru-RU',
+                    )}{' '}
+                    ₽
+                  </strong>
+                </div>
+
+                <button
+                  type="button"
+                  className="checkout-button"
+                  onClick={checkout}
+                  disabled={checkoutLoading}
+                >
+                  {checkoutLoading
+                    ? 'Оформляем...'
+                    : 'Оформить заказ'}
+                </button>
+              </div>
+            )}
+          </aside>
+        </div>
+      )}
+    </div>
+  )
 }
->
-В обработке
-</button>
 
-
-<button
-onClick={() =>
-updateOrderStatus(
-order.id,
-'Отправлен'
-)
-}
->
-Отправлен
-</button>
-
-
-<button
-onClick={() =>
-updateOrderStatus(
-order.id,
-'Завершён'
-)
-}
->
-Завершён
-</button>
-
-</div>
-
-
-
-<button
-className="admin-add-button"
-onClick={() =>
-setOpenOrder(
-openOrder === order.id
-?
-null
-:
-order.id
-)
-}
->
-{
-openOrder === order.id
-?
-'Скрыть заказ'
-:
-'Открыть заказ'
-}
-
-</button>
-
-
-
-
-{
-openOrder===order.id &&
-
-<div className="order-card">
-
-
-<h3>
-Детали заказа
-</h3>
-
-
-<p>
-🚚 Доставка СДЭК
-</p>
-
-
-<input
-placeholder="Трек СДЭК"
-value={
-trackNumbers[order.id]
-||
-order.cdek_track
-||
-''
-}
-onChange={
-e =>
-setTrackNumbers({
-
-...trackNumbers,
-
-[order.id]:
-e.target.value
-
-})
-}
-/>
-
-
-<button
-className="admin-add-button"
-onClick={() =>
-saveTrack(order.id)
-}
->
-Сохранить трек
-</button>
-
-
-<h4>
-Товары:
-</h4>
-
-
-{
-order.order_items?.map(item=>(
-
-<div key={item.id}>
-
-{item.product_name}
-
-<br/>
-
-Количество:
-{item.quantity}
-
-<br/>
-
-Цена:
-{item.price} ₽
-
-<hr/>
-
-</div>
-
-))
-}
-
-
-</div>
-
-}
-
-
-</div>
-
-
-</div>
-
-
-))
-}
-
-
-</div>
-
-}
-
-</section>
-
-
-
-
-
-{
-editingProduct &&
-
-<div className="order-card">
-
-<h3>
-Редактирование товара
-</h3>
-
-
-<input
-value={editingProduct.name}
-onChange={
-e =>
-setEditingProduct({
-
-...editingProduct,
-
-name:e.target.value
-
-})
-}
-/>
-
-
-<textarea
-value={
-editingProduct.description || ''
-}
-onChange={
-e =>
-setEditingProduct({
-
-...editingProduct,
-
-description:e.target.value
-
-})
-}
-/>
-
-
-<input
-type="number"
-value={editingProduct.price}
-onChange={
-e =>
-setEditingProduct({
-
-...editingProduct,
-
-price:e.target.value
-
-})
-}
-/>
-
-
-<input
-type="number"
-value={editingProduct.stock}
-onChange={
-e =>
-setEditingProduct({
-
-...editingProduct,
-
-stock:e.target.value
-
-})
-}
-/>
-
-
-<input
-value={
-editingProduct.image_url || ''
-}
-onChange={
-e =>
-setEditingProduct({
-
-...editingProduct,
-
-image_url:e.target.value
-
-})
-}
-/>
-
-
-<button
-className="admin-add-button"
-onClick={updateProduct}
->
-Сохранить
-</button>
-
-
-<button
-onClick={() =>
-setEditingProduct(null)
-}
->
-Отмена
-</button>
-
-
-</div>
-
-}
-
-
-
-
-
-<section className="admin-list-section">
-
-
-<p className="section-label">
-ТОВАРЫ
-</p>
-
-
-
-{
-loading ?
-
-<div className="admin-empty">
-Загрузка...
-</div>
-
-
-:
-
-products.length===0 ?
-
-<div className="admin-empty">
-Товаров нет
-</div>
-
-
-:
-
-<div className="admin-products">
-
-
-{
-products.map(product=>(
-
-
-<div
-className="admin-product"
-key={product.id}
->
-
-
-<div className="admin-product-info">
-
-
-<strong>
-{product.name}
-</strong>
-
-
-<span>
-{product.price} ₽
-</span>
-
-
-<small>
-Остаток: {product.stock}
-</small>
-
-
-</div>
-
-
-
-<button
-className="admin-add-button"
-onClick={() =>
-setEditingProduct({
-...product
-})
-}
->
-✏️ Изменить
-</button>
-
-
-
-<button
-className="admin-delete-button"
-onClick={() =>
-deleteProduct(product.id)
-}
->
-Удалить
-</button>
-
-
-</div>
-
-
-))
-}
-
-
-</div>
-
-}
-
-
-</section>
-
-
-</div>
-
-</div>
-
-</div>
-
-)
-
-}
-
-
-export default Admin
+export default App
