@@ -6,6 +6,214 @@ import Requisites from './Requisites'
 import './App.css'
 
 const YOOMONEY_WALLET = '4100119639377973'
+```jsx
+function LegalPage({ type }) {
+  const pages = {
+    offer: {
+      title: 'Публичная оферта',
+      text: (
+        <>
+          <p>
+            Настоящая страница содержит основные условия продажи товаров
+            через YouTubeOS Shop.
+          </p>
+
+          <h3>1. Общие положения</h3>
+          <p>
+            YouTubeOS Shop предоставляет информацию о товарах, их стоимости,
+            наличии, способах оплаты и доставки.
+          </p>
+
+          <h3>2. Заказ товара</h3>
+          <p>
+            Покупатель оформляет заказ через сайт. После оформления заказа
+            информация о заказе сохраняется в системе магазина.
+          </p>
+
+          <h3>3. Оплата</h3>
+          <p>
+            Оплата производится способом, указанным на странице оформления
+            заказа.
+          </p>
+
+          <h3>4. Доставка</h3>
+          <p>
+            Доставка осуществляется выбранным способом, указанным при
+            оформлении заказа.
+          </p>
+
+          <h3>5. Возврат</h3>
+          <p>
+            Условия возврата товара определяются действующим
+            законодательством и правилами магазина.
+          </p>
+        </>
+      ),
+    },
+
+    privacy: {
+      title: 'Политика конфиденциальности',
+      text: (
+        <>
+          <p>
+            YouTubeOS Shop уважает конфиденциальность пользователей сайта.
+          </p>
+
+          <h3>Какие данные могут использоваться</h3>
+          <p>
+            Для работы магазина могут обрабатываться данные, необходимые
+            для регистрации, оформления заказа, связи с покупателем и
+            доставки товара.
+          </p>
+
+          <h3>Использование данных</h3>
+          <p>
+            Полученные данные используются для работы сайта, обработки
+            заказов, оплаты, доставки и связи с покупателем.
+          </p>
+
+          <h3>Защита данных</h3>
+          <p>
+            YouTubeOS Shop принимает разумные меры для защиты информации
+            пользователей от несанкционированного доступа.
+          </p>
+        </>
+      ),
+    },
+
+    delivery: {
+      title: 'Доставка и оплата',
+      text: (
+        <>
+          <h3>Доставка</h3>
+          <p>
+            Доставка товаров осуществляется через службы доставки,
+            указанные на сайте. Конкретный способ доставки согласуется
+            при оформлении заказа.
+          </p>
+
+          <h3>Сроки доставки</h3>
+          <p>
+            Срок доставки зависит от выбранной службы доставки,
+            направления и наличия товара.
+          </p>
+
+          <h3>Оплата</h3>
+          <p>
+            Доступный способ оплаты отображается при оформлении заказа.
+          </p>
+
+          <h3>Стоимость доставки</h3>
+          <p>
+            Стоимость доставки зависит от выбранного способа и
+            направления доставки.
+          </p>
+        </>
+      ),
+    },
+
+    returns: {
+      title: 'Возврат товара',
+      text: (
+        <>
+          <p>
+            Возврат и обмен товаров осуществляются в соответствии
+            с применимым законодательством и условиями продажи.
+          </p>
+
+          <h3>Если товар повреждён</h3>
+          <p>
+            При получении повреждённого товара рекомендуется сохранить
+            упаковку и связаться с поддержкой YouTubeOS Shop.
+          </p>
+
+          <h3>Если пришёл другой товар</h3>
+          <p>
+            Если полученный товар не соответствует заказу, необходимо
+            обратиться в поддержку магазина для решения вопроса.
+          </p>
+
+          <h3>Связь с магазином</h3>
+          <p>
+            По вопросам возврата можно обратиться в поддержку:
+          </p>
+
+          <p>
+            <a
+              href="https://t.me/YouTubeOS"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Telegram: @YouTubeOS
+            </a>
+          </p>
+        </>
+      ),
+    },
+  }
+
+  const page = pages[type]
+
+  if (!page) {
+    return null
+  }
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="header-inner">
+          <a href="/" className="logo">
+            <span className="logo-main">
+              YOUTUBEOS
+            </span>
+
+            <span className="logo-shop">
+              SHOP
+            </span>
+          </a>
+        </div>
+      </header>
+
+      <main className="legal-page">
+        <div className="legal-page-inner">
+          <a href="/" className="legal-back">
+            ← Вернуться в магазин
+          </a>
+
+          <p className="section-label">
+            YOUTUBEOS SHOP
+          </p>
+
+          <h1>{page.title}</h1>
+
+          <div className="legal-content">
+            {page.text}
+          </div>
+        </div>
+      </main>
+
+      <footer className="footer">
+        <div>
+          <strong>YouTubeOS Shop</strong>
+
+          <p>
+            © {new Date().getFullYear()} YouTubeOS Shop
+          </p>
+        </div>
+
+        <a
+          href="https://t.me/YouTubeOS"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-button"
+        >
+          Поддержка
+        </a>
+      </footer>
+    </div>
+  )
+}
+```
 
 function App() {
   const [products, setProducts] = useState([])
@@ -365,9 +573,30 @@ function App() {
     setAdminOpen(false)
   }
 
-  if (window.location.pathname === '/requisites') {
-    return <Requisites />
-  }
+  ```jsx
+const pathname = window.location.pathname
+
+if (pathname === '/requisites') {
+  return <Requisites />
+}
+
+if (pathname === '/offer') {
+  return <LegalPage type="offer" />
+}
+
+if (pathname === '/privacy') {
+  return <LegalPage type="privacy" />
+}
+
+if (pathname === '/delivery') {
+  return <LegalPage type="delivery" />
+}
+
+if (pathname === '/returns') {
+  return <LegalPage type="returns" />
+}
+```
+
 
   return (
     <div className="app">
@@ -639,13 +868,30 @@ function App() {
         )}
       </section>
 
-      <footer className="footer">
+      ```jsx
+<footer className="footer">
   <div>
     <strong>YouTubeOS Shop</strong>
 
     <p>
       © {new Date().getFullYear()} YouTubeOS Shop
     </p>
+  </div>
+
+  <div className="footer-links">
+    <a href="/offer">Публичная оферта</a>
+
+    <a href="/privacy">
+      Политика конфиденциальности
+    </a>
+
+    <a href="/delivery">
+      Доставка и оплата
+    </a>
+
+    <a href="/returns">
+      Возврат товара
+    </a>
   </div>
 
   <a
@@ -657,6 +903,8 @@ function App() {
     Поддержка
   </a>
 </footer>
+```
+
 
       {authOpen && (
         <Auth
