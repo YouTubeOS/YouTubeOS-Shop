@@ -6,7 +6,7 @@ import Requisites from './Requisites'
 import './App.css'
 
 const YOOMONEY_WALLET = '4100119639377973'
-```jsx
+
 function LegalPage({ type }) {
   const pages = {
     offer: {
@@ -213,7 +213,7 @@ function LegalPage({ type }) {
     </div>
   )
 }
-```
+
 
 function App() {
   const [products, setProducts] = useState([])
@@ -573,30 +573,27 @@ function App() {
     setAdminOpen(false)
   }
 
-  ```jsx
-const pathname = window.location.pathname
+  const pathname = window.location.pathname
 
-if (pathname === '/requisites') {
-  return <Requisites />
-}
+  if (pathname === '/requisites') {
+    return <Requisites />
+  }
 
-if (pathname === '/offer') {
-  return <LegalPage type="offer" />
-}
+  if (pathname === '/offer') {
+    return <LegalPage type="offer" />
+  }
 
-if (pathname === '/privacy') {
-  return <LegalPage type="privacy" />
-}
+  if (pathname === '/privacy') {
+    return <LegalPage type="privacy" />
+  }
 
-if (pathname === '/delivery') {
-  return <LegalPage type="delivery" />
-}
+  if (pathname === '/delivery') {
+    return <LegalPage type="delivery" />
+  }
 
-if (pathname === '/returns') {
-  return <LegalPage type="returns" />
-}
-```
-
+  if (pathname === '/returns') {
+    return <LegalPage type="returns" />
+  }
 
   return (
     <div className="app">
@@ -868,43 +865,42 @@ if (pathname === '/returns') {
         )}
       </section>
 
-      ```jsx
-<footer className="footer">
-  <div>
-    <strong>YouTubeOS Shop</strong>
+      <footer className="footer">
+        <div>
+          <strong>YouTubeOS Shop</strong>
 
-    <p>
-      © {new Date().getFullYear()} YouTubeOS Shop
-    </p>
-  </div>
+          <p>
+            © {new Date().getFullYear()} YouTubeOS Shop
+          </p>
+        </div>
 
-  <div className="footer-links">
-    <a href="/offer">Публичная оферта</a>
+        <div className="footer-links">
+          <a href="/offer">
+            Публичная оферта
+          </a>
 
-    <a href="/privacy">
-      Политика конфиденциальности
-    </a>
+          <a href="/privacy">
+            Политика конфиденциальности
+          </a>
 
-    <a href="/delivery">
-      Доставка и оплата
-    </a>
+          <a href="/delivery">
+            Доставка и оплата
+          </a>
 
-    <a href="/returns">
-      Возврат товара
-    </a>
-  </div>
+          <a href="/returns">
+            Возврат товара
+          </a>
+        </div>
 
-  <a
-    href="https://t.me/YouTubeOS"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="header-button"
-  >
-    Поддержка
-  </a>
-</footer>
-```
-
+        <a
+          href="https://t.me/YouTubeOS"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-button"
+        >
+          Поддержка
+        </a>
+      </footer>
 
       {authOpen && (
         <Auth
