@@ -695,9 +695,7 @@ function App() {
               YouTubeOS Shop
             </p>
 
-            <p className="hero-text">
-              Музыка, пони и всё интересное.
-            </p>
+            <p>Доставка по всей России и Европе.</p>
 
             <a
               href="#catalog"
