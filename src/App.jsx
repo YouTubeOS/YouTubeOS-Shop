@@ -38,10 +38,10 @@ function LegalPage({ type }) {
 
           <h3>4. Доставка</h3>
           <p>
-            Доставка товаров осуществляется через транспортную компанию СДЭК.
-            После отправки заказа покупателю предоставляется трек-номер для
-            отслеживания отправления.
-          </p>
+  Доставка товаров осуществляется через транспортную компанию СДЭК.
+  После отправки заказа покупателю предоставляется трек-номер для
+  отслеживания отправления.
+</p>
 
           <h3>5. Возврат</h3>
           <p>
@@ -69,10 +69,10 @@ function LegalPage({ type }) {
 
           <h3>Использование данных</h3>
           <p>
-            Полученные данные используются для работы сайта, обработки
-            заказов, оплаты, доставки и связи с покупателем. При необходимости
-            данные, необходимые для доставки, могут передаваться службе СДЭК.
-          </p>
+  Полученные данные используются для работы сайта, обработки
+  заказов, оплаты, доставки и связи с покупателем. При необходимости
+  данные, необходимые для доставки, могут передаваться службе СДЭК.
+</p>
 
           <h3>Защита данных</h3>
           <p>
@@ -89,10 +89,10 @@ function LegalPage({ type }) {
         <>
           <h3>Доставка</h3>
           <p>
-            Доставка товаров осуществляется через транспортную компанию СДЭК.
-            После отправки заказа покупателю предоставляется трек-номер для
-            отслеживания отправления.
-          </p>
+  Доставка товаров осуществляется через транспортную компанию СДЭК.
+  После отправки заказа покупателю предоставляется трек-номер для
+  отслеживания отправления.
+</p>
 
           <h3>Сроки доставки</h3>
           <p>
@@ -216,17 +216,16 @@ function LegalPage({ type }) {
   )
 }
 
-function App() {
-  const pathname = window.location.pathname
 
+function App() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('Все')
 
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('YouTubeOS_Shop_cart')
-
       if (!saved) return []
 
       const parsed = JSON.parse(saved)
@@ -327,18 +326,20 @@ function App() {
     const text = search.trim().toLowerCase()
 
     return products.filter((product) => {
-      const matchesCategory =
-        product.category?.toLowerCase() === 'музыка'
-
       const matchesSearch =
         !text ||
         product.name?.toLowerCase().includes(text) ||
         product.description?.toLowerCase().includes(text) ||
         product.category?.toLowerCase().includes(text)
 
-      return matchesCategory && matchesSearch
+      const matchesCategory =
+        categoryFilter === 'Все' ||
+        product.category?.toLowerCase() ===
+          categoryFilter.toLowerCase()
+
+      return matchesSearch && matchesCategory
     })
-  }, [products, search])
+  }, [products, search, categoryFilter])
 
   const cartCount = useMemo(() => {
     return cart.reduce(
@@ -574,6 +575,8 @@ function App() {
     setAdminOpen(false)
   }
 
+  const pathname = window.location.pathname
+
   if (pathname === '/requisites') {
     return <Requisites />
   }
@@ -703,12 +706,8 @@ function App() {
       <section className="hero">
         <div className="hero-content">
           <p className="hero-label">
-            🎵 МУЗЫКА
-          </p>
-
-          <h1 className="hero-title">
             YouTubeOS Shop
-          </h1>
+          </p>
 
           <p className="hero-text">
             Доставка по всей России и Европе.
@@ -730,7 +729,28 @@ function App() {
               КАТАЛОГ
             </p>
 
-            <h2>Музыка</h2>
+            <h2>Наши товары</h2>
+
+            <div className="category-buttons">
+              {['Все', 'Музыка'].map(
+                (cat) => (
+                  <button
+                    type="button"
+                    key={cat}
+                    className={
+                      categoryFilter === cat
+                        ? 'active-category'
+                        : ''
+                    }
+                    onClick={() =>
+                      setCategoryFilter(cat)
+                    }
+                  >
+                    {cat}
+                  </button>
+                ),
+              )}
+            </div>
           </div>
 
           <span className="product-count">
