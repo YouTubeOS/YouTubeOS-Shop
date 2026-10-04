@@ -243,6 +243,9 @@ function App() {
   })
 
   const [cartOpen, setCartOpen] = useState(false)
+  const [ordersOpen, setOrdersOpen] = useState(false)
+const [orders, setOrders] = useState([])
+const [ordersLoading, setOrdersLoading] = useState(false)
   const [user, setUser] = useState(null)
 
   const [authOpen, setAuthOpen] = useState(false)
