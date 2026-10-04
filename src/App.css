@@ -2095,3 +2095,20 @@ button {
   background: rgba(255, 255, 255, 0.16);
   transform: translateY(-1px);
 }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-main,
+.logo-shop {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo-pumpkin {
+  display: inline-block;
+  line-height: 1;
+  transform: translateY(0);
+}

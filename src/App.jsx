@@ -602,14 +602,14 @@ function App() {
       <header className="header">
         <div className="header-inner">
           <a href="/" className="logo">
-            <span className="logo-main">
-              YOUTUBEOS
-            </span>
+  <span className="logo-main">
+    Y<span className="logo-pumpkin">🎃</span>TUBEOS
+  </span>
 
-            <span className="logo-shop">
-              SHOP
-            </span>
-          </a>
+  <span className="logo-shop logo-web">
+    SHOP
+  </span>
+</a>
 
           <div className="search">
             <span className="search-icon">⌕</span>
