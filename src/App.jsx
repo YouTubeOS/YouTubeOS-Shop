@@ -703,24 +703,37 @@ function App() {
         </div>
       </header>
 
-      <section className="hero">
-        <div className="hero-content">
-          <p className="hero-label">
-            YouTubeOS Shop
-          </p>
+      ```jsx
+<section className="hero">
+  <div className="hero-content">
+    <p className="hero-label">
+      YouTubeOS Shop
+    </p>
 
-          <p className="hero-text">
-            Доставка по всей России и Европе.
-          </p>
+    <p className="hero-text">
+      Доставка по всей России и Европе.
+    </p>
 
-          <a
-            href="#catalog"
-            className="hero-button"
-          >
-            Смотреть каталог
-          </a>
-        </div>
-      </section>
+    <a
+      href="#catalog"
+      className="hero-button"
+    >
+      Смотреть каталог
+    </a>
+  </div>
+
+  <div className="hero-record" aria-hidden="true">
+    <div className="record">
+      <div className="record-label">
+        YOUTUBEOS
+      </div>
+
+      <div className="record-hole"></div>
+    </div>
+  </div>
+</section>
+```
+
 
       <section className="catalog" id="catalog">
         <div className="catalog-top">
