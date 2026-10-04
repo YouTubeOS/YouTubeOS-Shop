@@ -703,8 +703,7 @@ function App() {
         </div>
       </header>
 
-      ```jsx
-<section className="hero">
+      <section className="hero">
   <div className="hero-content">
     <p className="hero-label">
       YouTubeOS Shop
@@ -732,7 +731,6 @@ function App() {
     </div>
   </div>
 </section>
-```
 
 
       <section className="catalog" id="catalog">
