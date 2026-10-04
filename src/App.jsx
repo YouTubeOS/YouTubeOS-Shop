@@ -724,27 +724,28 @@ function App() {
 
       <section className="catalog" id="catalog">
         <div className="catalog-top">
-          <div>
-            <p className="section-label">
-              КАТАЛОГ
-            </p>
+  <div>
+    <p className="section-label">
+      КАТАЛОГ
+    </p>
 
-            <h2>Наши товары</h2>
+    <h2>Наши товары</h2>
 
-            <div className="category-switcher">
-  <button
-    type="button"
-    className="category-button active"
-    onClick={() => setSelectedCategory('Музыка')}
-  >
-    🎵 Музыка
-  </button>
+    <div className="category-switcher">
+      <button
+        type="button"
+        className="category-button active"
+        onClick={() => setSelectedCategory('Музыка')}
+      >
+        🎵 Музыка
+      </button>
+    </div>
+  </div>
+
+  <span className="product-count">
+    {filteredProducts.length} товаров
+  </span>
 </div>
-
-          <span className="product-count">
-            {filteredProducts.length} товаров
-          </span>
-        </div>
 
         {loading ? (
           <div className="empty">
