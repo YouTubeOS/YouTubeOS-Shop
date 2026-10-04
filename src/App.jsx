@@ -603,10 +603,10 @@ function App() {
         <div className="header-inner">
           <a href="/" className="logo">
   <span className="logo-main">
-    Y<span className="logo-pumpkin">🎃</span>TUBEOS
+    YOUTUBEOS
   </span>
 
-  <span className="logo-shop logo-web">
+  <span className="logo-shop">
     SHOP
   </span>
 </a>

@@ -2106,61 +2106,6 @@ button {
   display: inline-flex;
   align-items: center;
 }
-
-.logo-pumpkin {
-  display: inline-block;
-  line-height: 1;
-  transform: translateY(0);
-}
-/* Halloween — SHOP обмотан паутиной */
-.logo-web {
-  position: relative;
-  display: inline-block;
-  isolation: isolate;
-  z-index: 1;
-}
-
-/* Основная паутина поверх SHOP */
-.logo-web::before {
-  content: '';
-  position: absolute;
-  inset: -12px -8px -10px -8px;
-  pointer-events: none;
-  z-index: 2;
-
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 0 28%,
-      rgba(255, 255, 255, 0.85) 29% 30%,
-      transparent 31% 43%,
-      rgba(255, 255, 255, 0.75) 44% 45%,
-      transparent 46% 59%,
-      rgba(255, 255, 255, 0.7) 60% 61%,
-      transparent 62%
-    ),
-    repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      rgba(255, 255, 255, 0.75) 0deg 1deg,
-      transparent 1deg 30deg
-    );
-
-  opacity: 0.8;
-  transform: rotate(-8deg);
-}
-
-/* Свисающая паутина */
-.logo-web::after {
-  content: '🕸️';
-  position: absolute;
-  right: -8px;
-  top: -15px;
-  font-size: 0.7em;
-  line-height: 1;
-  pointer-events: none;
-  z-index: 3;
-  transform: rotate(12deg);
-}
 /* COLOR VINYL IN HERO */
 .hero-record {
   position: absolute;
