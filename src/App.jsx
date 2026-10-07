@@ -1233,7 +1233,6 @@ function App() {
             Возврат товара
           </a>
 
-          className="footer-email"
   youtubeosshop@gmail.com
 </div>
 
