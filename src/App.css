@@ -2354,3 +2354,8 @@ button {
   border-radius: 10px;
   cursor: pointer;
 }
+.footer-email {
+  color: #999;
+  font-size: 14px;
+  margin-top: 8px;
+}

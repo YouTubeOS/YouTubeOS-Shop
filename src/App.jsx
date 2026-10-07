@@ -1233,12 +1233,9 @@ function App() {
             Возврат товара
           </a>
 
-          <a
-            href="mailto:youtubeosshop@gmail.com"
-          >
-            Email
-          </a>
-        </div>
+          className="footer-email"
+  youtubeosshop@gmail.com
+</div>
 
         <a
           href="https://t.me/YouTubeOS"
