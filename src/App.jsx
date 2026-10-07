@@ -38,10 +38,10 @@ function LegalPage({ type }) {
 
           <h3>4. Доставка</h3>
           <p>
-  Доставка товаров осуществляется через транспортную компанию СДЭК.
-  После отправки заказа покупателю предоставляется трек-номер для
-  отслеживания отправления.
-</p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
 
           <h3>5. Возврат</h3>
           <p>
@@ -69,10 +69,10 @@ function LegalPage({ type }) {
 
           <h3>Использование данных</h3>
           <p>
-  Полученные данные используются для работы сайта, обработки
-  заказов, оплаты, доставки и связи с покупателем. При необходимости
-  данные, необходимые для доставки, могут передаваться службе СДЭК.
-</p>
+            Полученные данные используются для работы сайта, обработки
+            заказов, оплаты, доставки и связи с покупателем. При необходимости
+            данные, необходимые для доставки, могут передаваться службе СДЭК.
+          </p>
 
           <h3>Защита данных</h3>
           <p>
@@ -89,10 +89,10 @@ function LegalPage({ type }) {
         <>
           <h3>Доставка</h3>
           <p>
-  Доставка товаров осуществляется через транспортную компанию СДЭК.
-  После отправки заказа покупателю предоставляется трек-номер для
-  отслеживания отправления.
-</p>
+            Доставка товаров осуществляется через транспортную компанию СДЭК.
+            После отправки заказа покупателю предоставляется трек-номер для
+            отслеживания отправления.
+          </p>
 
           <h3>Сроки доставки</h3>
           <p>
@@ -102,7 +102,8 @@ function LegalPage({ type }) {
 
           <h3>Оплата</h3>
           <p>
-            Доступный способ оплаты отображается при оформлении заказа.
+            Доступный способ оплаты отображается при оформлении
+            заказа.
           </p>
 
           <h3>Стоимость доставки</h3>
@@ -216,7 +217,6 @@ function LegalPage({ type }) {
   )
 }
 
-
 function App() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -226,6 +226,7 @@ function App() {
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('YouTubeOS_Shop_cart')
+
       if (!saved) return []
 
       const parsed = JSON.parse(saved)
@@ -244,8 +245,9 @@ function App() {
 
   const [cartOpen, setCartOpen] = useState(false)
   const [ordersOpen, setOrdersOpen] = useState(false)
-const [orders, setOrders] = useState([])
-const [ordersLoading, setOrdersLoading] = useState(false)
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+
   const [user, setUser] = useState(null)
 
   const [authOpen, setAuthOpen] = useState(false)
@@ -253,6 +255,14 @@ const [ordersLoading, setOrdersLoading] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
 
   const [checkoutLoading, setCheckoutLoading] = useState(false)
+
+  // ОТЗЫВЫ
+  const [reviews, setReviews] = useState([])
+  const [openReviews, setOpenReviews] = useState(null)
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewLoading, setReviewLoading] = useState(false)
+  const [purchasedProducts, setPurchasedProducts] = useState([])
 
   async function loadProducts() {
     setLoading(true)
@@ -281,6 +291,7 @@ const [ordersLoading, setOrdersLoading] = useState(false)
 
     if (!currentUser) {
       setIsAdmin(false)
+      setPurchasedProducts([])
       return
     }
 
@@ -293,15 +304,127 @@ const [ordersLoading, setOrdersLoading] = useState(false)
     if (error) {
       console.error('Ошибка проверки роли:', error)
       setIsAdmin(false)
+    } else {
+      setIsAdmin(data?.role === 'admin')
+    }
+
+    await loadPurchasedProducts(currentUser.id)
+  }
+
+  async function loadPurchasedProducts(userId) {
+    try {
+      const { data: userOrders, error: ordersError } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('user_id', userId)
+
+      if (ordersError) throw ordersError
+
+      if (!userOrders || userOrders.length === 0) {
+        setPurchasedProducts([])
+        return
+      }
+
+      const orderIds = userOrders.map((order) => order.id)
+
+      const { data: orderItems, error: itemsError } = await supabase
+        .from('order_items')
+        .select('product_id')
+        .in('order_id', orderIds)
+
+      if (itemsError) throw itemsError
+
+      const productIds = [
+        ...new Set(
+          (orderItems || []).map((item) => String(item.product_id)),
+        ),
+      ]
+
+      setPurchasedProducts(productIds)
+    } catch (error) {
+      console.error('Ошибка проверки покупок:', error)
+      setPurchasedProducts([])
+    }
+  }
+
+  async function loadReviews() {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Ошибка загрузки отзывов:', error)
       return
     }
 
-    setIsAdmin(data?.role === 'admin')
+    setReviews(data || [])
+  }
+
+  async function submitReview(productId) {
+    if (!user) {
+      alert('Сначала войди в аккаунт')
+      setAuthOpen(true)
+      return
+    }
+
+    const productIdString = String(productId)
+
+    if (!purchasedProducts.includes(productIdString)) {
+      alert('Оставить отзыв можно только после покупки этого товара.')
+      return
+    }
+
+    const alreadyReviewed = reviews.some(
+      (review) =>
+        String(review.product_id) === productIdString &&
+        review.user_id === user.id,
+    )
+
+    if (alreadyReviewed) {
+      alert('Ты уже оставлял отзыв на этот товар.')
+      return
+    }
+
+    if (!reviewComment.trim()) {
+      alert('Напиши текст отзыва')
+      return
+    }
+
+    setReviewLoading(true)
+
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .insert({
+          product_id: productId,
+          user_id: user.id,
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        })
+
+      if (error) throw error
+
+      setReviewComment('')
+      setReviewRating(5)
+
+      await loadReviews()
+    } catch (error) {
+      console.error('Ошибка отправки отзыва:', error)
+
+      alert(
+        error.message ||
+          'Не удалось отправить отзыв',
+      )
+    } finally {
+      setReviewLoading(false)
+    }
   }
 
   useEffect(() => {
     loadProducts()
     loadUser()
+    loadReviews()
 
     const {
       data: { subscription },
@@ -576,6 +699,7 @@ const [ordersLoading, setOrdersLoading] = useState(false)
     setUser(null)
     setIsAdmin(false)
     setAdminOpen(false)
+    setPurchasedProducts([])
   }
 
   const pathname = window.location.pathname
@@ -605,14 +729,14 @@ const [ordersLoading, setOrdersLoading] = useState(false)
       <header className="header">
         <div className="header-inner">
           <a href="/" className="logo">
-  <span className="logo-main">
-    YOUTUBEOS
-  </span>
+            <span className="logo-main">
+              YOUTUBEOS
+            </span>
 
-  <span className="logo-shop">
-    SHOP
-  </span>
-</a>
+            <span className="logo-shop">
+              SHOP
+            </span>
+          </a>
 
           <div className="search">
             <span className="search-icon">⌕</span>
@@ -707,62 +831,67 @@ const [ordersLoading, setOrdersLoading] = useState(false)
       </header>
 
       <section className="hero">
-  <div className="hero-content">
-    <p className="hero-label">
-      YouTubeOS Shop
-    </p>
+        <div className="hero-content">
+          <p className="hero-label">
+            YouTubeOS Shop
+          </p>
 
-    <p className="hero-text">
-      Доставка по всей России и Европе.
-    </p>
+          <p className="hero-text">
+            Доставка по всей России и Европе.
+          </p>
 
-    <a
-      href="#catalog"
-      className="hero-button"
-    >
-      Смотреть каталог
-    </a>
-  </div>
+          <a
+            href="#catalog"
+            className="hero-button"
+          >
+            Смотреть каталог
+          </a>
+        </div>
 
-  <div className="hero-record" aria-hidden="true">
-    <div className="record">
-      <div className="record-label">
-        YOUTUBEOS
-      </div>
+        <div className="hero-record" aria-hidden="true">
+          <div className="record">
+            <div className="record-label">
+              YOUTUBEOS
+            </div>
 
-      <div className="record-hole"></div>
-    </div>
-  </div>
-</section>
-
+            <div className="record-hole"></div>
+          </div>
+        </div>
+      </section>
 
       <section className="catalog" id="catalog">
         <div className="catalog-top">
-  <div>
-    <p className="section-label">
-      КАТАЛОГ
-    </p>
+          <div>
+            <p className="section-label">
+              КАТАЛОГ
+            </p>
 
-    <h2>Наши товары</h2>
+            <h2>Наши товары</h2>
 
-    <div className="category-buttons">
-  {['Все', 'Музыка'].map((category) => (
-    <button
-      key={category}
-      type="button"
-      className={categoryFilter === category ? 'active-category' : ''}
-      onClick={() => setCategoryFilter(category)}
-    >
-      {category}
-    </button>
-  ))}
-</div>
-  </div>
+            <div className="category-buttons">
+              {['Все', 'Музыка'].map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={
+                    categoryFilter === category
+                      ? 'active-category'
+                      : ''
+                  }
+                  onClick={() =>
+                    setCategoryFilter(category)
+                  }
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
 
-  <span className="product-count">
-    {filteredProducts.length} товаров
-  </span>
-</div>
+          <span className="product-count">
+            {filteredProducts.length} товаров
+          </span>
+        </div>
 
         {loading ? (
           <div className="empty">
@@ -800,75 +929,280 @@ const [ordersLoading, setOrdersLoading] = useState(false)
           </div>
         ) : (
           <div className="products">
-            {filteredProducts.map((product) => (
-              <article
-                className="product-card"
-                key={product.id}
-              >
-                <div className="product-image">
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                    />
-                  ) : (
-                    <div className="no-image">
-                      ♫
-                    </div>
-                  )}
+            {filteredProducts.map((product) => {
+              const productReviews = reviews.filter(
+                (review) =>
+                  String(review.product_id) ===
+                  String(product.id),
+              )
 
-                  {Number(product.stock) <= 0 && (
-                    <div className="sold-out">
-                      Нет в наличии
-                    </div>
-                  )}
-                </div>
+              const productRating =
+                productReviews.length > 0
+                  ? (
+                      productReviews.reduce(
+                        (sum, review) =>
+                          sum + Number(review.rating),
+                        0,
+                      ) / productReviews.length
+                    ).toFixed(1)
+                  : null
 
-                <div className="product-info">
-                  <div className="category">
-                    {product.category || 'ТОВАР'}
+              const userAlreadyReviewed =
+                user &&
+                productReviews.some(
+                  (review) =>
+                    review.user_id === user.id,
+                )
+
+              const userPurchased =
+                user &&
+                purchasedProducts.includes(
+                  String(product.id),
+                )
+
+              return (
+                <article
+                  className="product-card"
+                  key={product.id}
+                >
+                  <div className="product-image">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                      />
+                    ) : (
+                      <div className="no-image">
+                        ♫
+                      </div>
+                    )}
+
+                    {Number(product.stock) <= 0 && (
+                      <div className="sold-out">
+                        Нет в наличии
+                      </div>
+                    )}
                   </div>
 
-                  <h3>{product.name}</h3>
+                  <div className="product-info">
+                    <div className="category">
+                      {product.category || 'ТОВАР'}
+                    </div>
 
-                  <p>
-                    {product.description || ''}
-                  </p>
+                    <h3>{product.name}</h3>
 
-                  {Number(product.stock) > 0 ? (
-                    <small className="stock-info">
-                      Осталось: {product.stock} шт.
-                    </small>
-                  ) : (
-                    <small className="stock-empty">
-                      Нет в наличии
-                    </small>
-                  )}
+                    <p>
+                      {product.description || ''}
+                    </p>
 
-                  <div className="product-bottom">
-                    <strong>
-                      {Number(
-                        product.price || 0,
-                      ).toLocaleString('ru-RU')}{' '}
-                      ₽
-                    </strong>
+                    {Number(product.stock) > 0 ? (
+                      <small className="stock-info">
+                        Осталось: {product.stock} шт.
+                      </small>
+                    ) : (
+                      <small className="stock-empty">
+                        Нет в наличии
+                      </small>
+                    )}
+
+                    {productReviews.length > 0 && (
+                      <div className="product-rating">
+                        <span className="rating-stars">
+                          {Array.from(
+                            { length: 5 },
+                            (_, index) =>
+                              index <
+                              Math.round(
+                                Number(productRating),
+                              )
+                                ? '★'
+                                : '☆',
+                          ).join('')}
+                        </span>
+
+                        <span>
+                          {productRating} (
+                          {productReviews.length})
+                        </span>
+                      </div>
+                    )}
 
                     <button
                       type="button"
-                      className="add-button"
-                      disabled={
-                        Number(product.stock) <= 0
-                      }
+                      className="reviews-button"
                       onClick={() =>
-                        addToCart(product)
+                        setOpenReviews(
+                          openReviews === product.id
+                            ? null
+                            : product.id,
+                        )
                       }
                     >
-                      В корзину
+                      ★ Отзывы ({productReviews.length})
                     </button>
+
+                    {openReviews === product.id && (
+                      <div className="reviews-section">
+                        {productReviews.length > 0 ? (
+                          <div className="reviews-list">
+                            {productReviews.map(
+                              (review) => (
+                                <div
+                                  className="review"
+                                  key={review.id}
+                                >
+                                  <div className="review-top">
+                                    <strong>
+                                      Покупатель
+                                    </strong>
+
+                                    <span className="review-stars">
+                                      {Array.from(
+                                        { length: 5 },
+                                        (_, index) =>
+                                          index <
+                                          Number(
+                                            review.rating,
+                                          )
+                                            ? '★'
+                                            : '☆',
+                                      ).join('')}
+                                    </span>
+                                  </div>
+
+                                  <p>
+                                    {review.comment}
+                                  </p>
+
+                                  <small>
+                                    {new Date(
+                                      review.created_at,
+                                    ).toLocaleDateString(
+                                      'ru-RU',
+                                    )}
+                                  </small>
+
+                                  {review.user_id ===
+                                    user?.id && (
+                                    <div className="verified-review">
+                                      Ваш отзыв
+                                    </div>
+                                  )}
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        ) : (
+                          <p className="no-reviews">
+                            Пока нет отзывов.
+                          </p>
+                        )}
+
+                        {!user ? (
+                          <button
+                            type="button"
+                            className="review-login"
+                            onClick={() =>
+                              setAuthOpen(true)
+                            }
+                          >
+                            Войти, чтобы оставить отзыв
+                          </button>
+                        ) : !userPurchased ? (
+                          <p className="review-note">
+                            Оставить отзыв можно после
+                            покупки этого товара.
+                          </p>
+                        ) : userAlreadyReviewed ? (
+                          <p className="review-note">
+                            Ты уже оставлял отзыв на этот
+                            товар.
+                          </p>
+                        ) : (
+                          <div className="review-form">
+                            <h4>
+                              Оставить отзыв
+                            </h4>
+
+                            <div className="rating-select">
+                              {[1, 2, 3, 4, 5].map(
+                                (rating) => (
+                                  <button
+                                    key={rating}
+                                    type="button"
+                                    className={
+                                      rating <=
+                                      reviewRating
+                                        ? 'rating-active'
+                                        : ''
+                                    }
+                                    onClick={() =>
+                                      setReviewRating(
+                                        rating,
+                                      )
+                                    }
+                                  >
+                                    ★
+                                  </button>
+                                ),
+                              )}
+                            </div>
+
+                            <textarea
+                              value={reviewComment}
+                              onChange={(event) =>
+                                setReviewComment(
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Напиши свой отзыв..."
+                              rows="3"
+                            />
+
+                            <button
+                              type="button"
+                              className="review-submit"
+                              onClick={() =>
+                                submitReview(
+                                  product.id,
+                                )
+                              }
+                              disabled={reviewLoading}
+                            >
+                              {reviewLoading
+                                ? 'Отправляем...'
+                                : 'Оставить отзыв'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="product-bottom">
+                      <strong>
+                        {Number(
+                          product.price || 0,
+                        ).toLocaleString('ru-RU')}{' '}
+                        ₽
+                      </strong>
+
+                      <button
+                        type="button"
+                        className="add-button"
+                        disabled={
+                          Number(product.stock) <= 0
+                        }
+                        onClick={() =>
+                          addToCart(product)
+                        }
+                      >
+                        В корзину
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              )
+            })}
           </div>
         )}
       </section>
@@ -897,6 +1231,12 @@ const [ordersLoading, setOrdersLoading] = useState(false)
 
           <a href="/returns">
             Возврат товара
+          </a>
+
+          <a
+            href="mailto:youtubeosshop@gmail.com"
+          >
+            Email
           </a>
         </div>
 
