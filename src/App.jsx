@@ -830,28 +830,28 @@ function App() {
         </div>
       </header>
 
-      <section className="hero">
-        <div className="hero-content">
-          <p className="hero-label">
-            YouTubeOS Shop
-          </p>
+      
+      {pathname !== '/catalog' && (
+        <section className="hero">
+          <div className="hero-content">
+            <p className="hero-label">
+              YouTubeOS Shop
+            </p>
 
-          <p className="hero-text">
-            Доставка по всей России и Европе.
-          </p>
+            <p className="hero-text">
+              Доставка по всей России и Европе.
+            </p>
 
-          <a
-  href="/#catalog"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="hero-button"
->
-  Смотреть каталог
-</a>
-        </div>
+            <a
+              href="/catalog"
+              className="hero-button"
+            >
+              Смотреть каталог
+            </a>
+          </div>
+        </section>
+      )}
 
-        
-      </section>
 
 
       <section className="catalog" id="catalog">
