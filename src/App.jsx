@@ -848,16 +848,9 @@ function App() {
           </a>
         </div>
 
-        <div className="hero-record" aria-hidden="true">
-          <div className="record">
-            <div className="record-label">
-              YOUTUBEOS
-            </div>
-
-            <div className="record-hole"></div>
-          </div>
-        </div>
+        
       </section>
+
 
       <section className="catalog" id="catalog">
         <div className="catalog-top">
