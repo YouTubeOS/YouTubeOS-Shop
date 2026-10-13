@@ -841,11 +841,13 @@ function App() {
           </p>
 
           <a
-            href="#catalog"
-            className="hero-button"
-          >
-            Смотреть каталог
-          </a>
+  href="/#catalog"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hero-button"
+>
+  Смотреть каталог
+</a>
         </div>
 
         
